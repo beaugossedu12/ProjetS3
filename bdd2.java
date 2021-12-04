@@ -8,7 +8,7 @@ package fr.insa.zins.classe;
 import fr.insa.zins.classe.Etudiant.EtudiantNotFoundException;
 import static fr.insa.zins.classe.Etudiant.trouveEtudiant;
 import fr.insa.zins.classe.GroupeModule.GroupeModuleAlreadyExistsException;
-import static fr.insa.zins.classe.GroupeModule.afficheTousGroupesModules;
+import static fr.insa.zins.classe.GroupeModule.afficheTousGroupeModule;
 import static fr.insa.zins.classe.GroupeModule.trouveGroupeModule;
 import fr.insa.zins.classe.Module.ModuleAlreadyExistsException;
 import static fr.insa.zins.classe.Module.afficheTousModules;
@@ -41,6 +41,28 @@ public static Connection connectPostgresql(String host, int port,
         con.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
         return con;
     }
+   public static Connection testConnect() {
+        Connection con = null;
+        try {
+            // teste la pr�sence du driver postgresql
+            Class.forName("org.postgresql.Driver");
+            con = DriverManager.getConnection(
+                    "jdbc:postgresql://localhost:5432/postgres", "postgres", "pass");
+
+            con.setAutoCommit(false);
+                        con.commit();
+        } catch (Exception ex) {
+            if (con != null) {
+                try {
+                    con.rollback();
+                } catch (SQLException ex1) {}
+            }
+            throw new Error(ex);
+        }
+        return con;
+
+    }
+    
 //...
 
     /*public static void main1(String[] args) {
@@ -106,7 +128,7 @@ public static Connection connectPostgresql(String host, int port,
                create table GroupeModule(
                  id integer primary key generated always as identity,
                  nom varchar (50),
-                 description TEXT   
+                 description text   
                )
                """);
         }
@@ -143,12 +165,19 @@ public static Connection connectPostgresql(String host, int port,
                """);
             st.executeUpdate(
                     """
-               create table Module(
-               
+               create table GroupeModule(
                 id integer primary key generated always as identity,
                 nom varchar (50),
-                description TEXT,
-                idGM INTEGER not null
+                description text                   
+               )
+               """);
+            st.executeUpdate(
+                    """
+               create table Module(
+                id integer primary key generated always as identity,
+                nom varchar (50),
+                description text,
+                idGM integer not null
               )
                """);
             st.executeUpdate(
@@ -156,22 +185,15 @@ public static Connection connectPostgresql(String host, int port,
                alter table Module 
                  add constraint fk_idGM_id
                  foreign key(idGM)
-                 references Groupemodule(id)
+                 references GroupeModule(id)
                    on delete restrict
                    on update restrict
                """);
             
+
             st.executeUpdate(
                     """
-               create table GroupeModule(
-                id integer primary key generated always as identity,
-                nom varchar (50),
-                description TEXT,                    
-               )
-               """);
-            st.executeUpdate(                    """
                create table Etudiant(
-               
                 id integer primary key generated always as identity,
                idPersonne INTEGER not null
               )
@@ -185,11 +207,11 @@ public static Connection connectPostgresql(String host, int port,
                    on delete restrict
                    on update restrict
                """);
-            st.executeUpdate(                    """
-               create table Administrateur(
-               
+            st.executeUpdate( 
+                    """
+               create table Administrateur( 
                id integer primary key generated always as identity,
-               idPersonne INTEGER not null
+               idPersonne integer not null
               )
                """);
             st.executeUpdate(
@@ -207,7 +229,7 @@ public static Connection connectPostgresql(String host, int port,
                create table Voeux(
                 id integer primary key generated always as identity,
                 idEtudiant INTEGER not null,
-                idModule INTEGER not null, 
+               idGM INTEGER not null, 
                 choix1 INTEGER,
                 choix2 INTEGER,
                 choix3 INTEGER
@@ -247,8 +269,10 @@ public static Connection connectPostgresql(String host, int port,
         }
     }
 
-    public static void deleteSchema(Connection con) throws SQLException {
-        try ( Statement st = con.createStatement()) {
+    public static void deleteSchema(Connection con) throws SQLException
+    {
+        try ( Statement st = con.createStatement()) 
+        {
             con.setAutoCommit(false);
             // pour être sûr de pouvoir supprimer les tables,
             // le plus simple est de supprimer d'abord toutes
@@ -355,7 +379,7 @@ public static Connection connectPostgresql(String host, int port,
 
         try ( PreparedStatement pst = con.prepareStatement( 
                 """
-        insert into Module (nom,description) 
+        insert into GroupeModule (nom,description) 
           values (?,?)
         """,PreparedStatement.RETURN_GENERATED_KEYS)) {
             pst.setString(1, nom);
@@ -418,26 +442,25 @@ public static Connection connectPostgresql(String host, int port,
         }
     }
 
-    /*public static void creeDonneesTest(Connection con) throws SQLException {
+    public static void creeDonneesTest(Connection con) throws SQLException {
         String[][] donnees = new String[][]{
             // forme : {nom,prenom, email,mdp}
-            {"toto", "titi","ffe","ffe"},
-            {"Marley", "bob", "titi","fefg"},
-            {"SansSurnom", "bob", "titi","fefg"}};
+            {"toto", "titi","email1","mdp1"},
+            {"Marley", "bob", "email2","mdp2"},
+            {"SansSurnom", "bob", "email3","mdp3"}};
         for (String[] p : donnees) {
             //java.sql.Date d = java.sql.Date.valueOf(p[1]);
             try {
-                createPersonne(con, p[0], d);
-                for (int i = 2; i < p.length; i++) {
-                    ajouteSurnom(con, p[0], p[i]);
-                }
-            } catch (PersonneAlreadyExistsException | PersonneNotFoundException ex) {
+                createPersonne(con, p[0],p[1],p[2],p[3]);
+
+            } catch (PersonneAlreadyExistsException ex) {
                 throw new Error(ex);
             }
         }
-    }*/
+    }
 
-    /*public static void recreeTout(Connection con) throws SQLException {
+
+    public static void recreeTout(Connection con) throws SQLException {
         try {
             deleteSchema(con);
         } catch (SQLException ex) {
@@ -445,7 +468,7 @@ public static Connection connectPostgresql(String host, int port,
         }
         createSchema(con);
         creeDonneesTest(con);
-    }*/
+    }
 
     public static void afficheCorrespondances(Connection con) throws SQLException {
         try ( Statement st = con.createStatement()) {
@@ -470,7 +493,7 @@ public static Connection connectPostgresql(String host, int port,
         while (rep != 0) {
             System.out.println("Menu Principal");
             System.out.println("--------------");
-            //System.out.println("1) (re)créer toute la BdD");
+            System.out.println("1) (re)créer toute la BdD");
             System.out.println("2) ajouter une personne");
             System.out.println("3) ajouter un module");
             System.out.println("4) ajouter un groupe de module");
@@ -479,11 +502,12 @@ public static Connection connectPostgresql(String host, int port,
             System.out.println("6) afficher tous les modules");
             System.out.println("7) afficher toutes les groupes de modules");
            // System.out.println("5) afficher correspondances nom-surnom");
+            System.out.println("8) tout supprimer");
             rep = Console.entreeInt("Votre choix : ");
 
-           /* if (rep == 1) {
-                recreeTout(con);*/
-            /*} /*else*/ if (rep == 2) {
+           if (rep == 1) {
+                recreeTout(con);
+           }else if (rep == 2) {
                 String nom = Console.entreeString("nom : ");
                 String prenom = Console.entreeString("prenom :");
                 String email = Console.entreeString("email : ");
@@ -497,7 +521,7 @@ public static Connection connectPostgresql(String host, int port,
             } else if (rep == 3) {
                 String nom = Console.entreeString("nom : ");
                 String description = Console.entreeString("description : ");
-                Integer idGM= Console.entreeInt("idGM : ");
+                int idGM= Console.entreeInt("idGM : ");
                 try {
                     createModule(con, nom, description,idGM);
                 } catch (ModuleAlreadyExistsException ex) {
@@ -517,37 +541,34 @@ public static Connection connectPostgresql(String host, int port,
             } else if (rep == 6) {
                 afficheTousModules(con);
             }else if (rep == 7) {
-                afficheTousGroupesModules(con);
-            }/*else if (rep == 5) {
-                afficheCorrespondances(con);
-            }*/
-        }
-    }
-
-    public static void main(String[] args) {
-        try ( Connection con = connectPostgresql(
-                "localhost", 5432,
-                "postgres", "postgres", "pass")) {
-                
-
-                //createTablePersonne(con);
-               // createTableModule(con);
-                //createTableGroupeModule(con);
-                //createTableEtudiant(con);
-                //createTableAdministrateur(con);
-                //createTableVoeux(con);
-                
-                EnregistrerUnFichier();
+                afficheTousGroupeModule(con);
+            }else if (rep == 8) {
                 try {
                     deleteSchema(con);
                 } catch (Exception ex) {
                     System.out.println("Impossible d'effacer le schema");
                 }
-                //createSchema(con);
-                //createPersonne(con,"Zins","Sabine","sabine.zins@insa-strasbourg.fr", "pass");
-            //menuPrincipal(con);
-        } catch (Exception ex) {
-            throw new Error("Probleme SQL : " + ex.getMessage(), ex);
+            }
         }
     }
+
+    public static void main(String[] args) {
+       try ( Connection con = testConnect()) {
+                
+            //createSchema(con);
+            //deleteSchema(con);
+                
+                //EnregistrerUnFichier();
+
+                
+                //createPersonne(con,"Zins","Sabine","sabine.zins@insa-strasbourg.fr", "pass");
+            menuPrincipal(con);
+        } catch (Exception ex) {
+            throw new Error("Probleme SQL : " + ex.getMessage(), ex);
+       }
+       
+    }
+
+
+       
 }

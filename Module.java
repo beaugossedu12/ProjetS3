@@ -49,6 +49,23 @@ public class Module {
         }
     }
     
+    public static void ModifNomModule (Connection con, String nom, int id) throws SQLException
+    {
+        try ( PreparedStatement pst = con.prepareStatement(
+                """
+                update Module
+                set nom = ?
+                where id = ?
+                """)){
+            pst.setString(1, nom);
+            pst.setInt(2, id);
+            pst.executeUpdate();
+            
+        }
+                       
+                        
+    }
+    
     public static class ModuleAlreadyExistsException extends Exception {
 
         public ModuleAlreadyExistsException(String nom) {

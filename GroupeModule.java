@@ -16,7 +16,7 @@ import java.sql.Statement;
  * @author sabin
  */
 public class GroupeModule {
-    public static void afficheTousGroupesModules(Connection con)throws SQLException
+    public static void afficheTousGroupeModule(Connection con)throws SQLException
     {
         try ( Statement st = con.createStatement()) {
             ResultSet res = st.executeQuery(
@@ -45,6 +45,38 @@ public class GroupeModule {
             }
             return findP.getInt(1);
         }
+    }
+    
+    public static void ModifNomGroupeModule (Connection con, String nom, int id) throws SQLException
+    {
+        try ( PreparedStatement pst = con.prepareStatement(
+                """
+                update GroupeModule
+                set nom = ?
+                where id = ?
+                """)){
+            pst.setString(1, nom);
+            pst.setInt(2, id);
+            pst.executeUpdate();
+            
+        }
+                        
+    }
+    
+    public static void ModifDescriptionGroupeModule (Connection con, String description, int id) throws SQLException
+    {
+        try ( PreparedStatement pst = con.prepareStatement(
+                """
+                update GroupeModule
+                set description = ?
+                where id = ?
+                """)){
+            pst.setString(1, description);
+            pst.setInt(2, id);
+            pst.executeUpdate();
+            
+        }
+                        
     }
     public static class GroupeModuleNotFoundException extends Exception {
 
