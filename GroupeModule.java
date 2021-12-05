@@ -46,37 +46,51 @@ public class GroupeModule {
             return findP.getInt(1);
         }
     }
-    
-    public static void ModifNomGroupeModule (Connection con, String nom, int id) throws SQLException
+
+    public static void ModifNomGroupeModule (Connection con, String nom, String nomModifie) throws SQLException
     {
         try ( PreparedStatement pst = con.prepareStatement(
                 """
                 update GroupeModule
                 set nom = ?
-                where id = ?
+                where nom = ?
                 """)){
-            pst.setString(1, nom);
-            pst.setInt(2, id);
+            pst.setString(1, nomModifie);
+            pst.setString(2, nom);
             pst.executeUpdate();
-            
+            con.commit();
+        } catch (Exception ex) {
+            System.out.println(ex);
         }
                         
     }
     
-    public static void ModifDescriptionGroupeModule (Connection con, String description, int id) throws SQLException
+    public static void ModifDescriptionGroupeModule (Connection con, String nom, String description) throws SQLException
     {
         try ( PreparedStatement pst = con.prepareStatement(
                 """
                 update GroupeModule
                 set description = ?
-                where id = ?
+                where nom= ?
                 """)){
             pst.setString(1, description);
-            pst.setInt(2, id);
+            pst.setString(2, nom);
             pst.executeUpdate();
-            
+            con.commit();
+        } catch (Exception ex) {
+            System.out.println(ex);
+        }                   
+    }
+    public static void deleteGroupeModule(Connection con,String nom) throws SQLException
+    {
+        try ( PreparedStatement pst = con.prepareStatement( 
+        "delete from GroupeModule where nom = ?")){
+        pst.setString(1, nom);
+        pst.executeUpdate();   
+        //con.commit();
+        } catch (Exception ex) {
+            System.out.println(ex);
         }
-                        
     }
     public static class GroupeModuleNotFoundException extends Exception {
 

@@ -5,17 +5,21 @@
  */
 package fr.insa.zins.classe;
 
-import fr.insa.zins.classe.Etudiant.EtudiantNotFoundException;
+import fr.insa.zins.classe.Etudiant.EtudiantAlreadyExistsException;
 import static fr.insa.zins.classe.Etudiant.trouveEtudiant;
 import fr.insa.zins.classe.GroupeModule.GroupeModuleAlreadyExistsException;
 import static fr.insa.zins.classe.GroupeModule.afficheTousGroupeModule;
+import static fr.insa.zins.classe.GroupeModule.deleteGroupeModule;
 import static fr.insa.zins.classe.GroupeModule.trouveGroupeModule;
+import static fr.insa.zins.classe.Module.ModifDescriptionModule;
+import static fr.insa.zins.classe.Module.ModifNomModule;
 import fr.insa.zins.classe.Module.ModuleAlreadyExistsException;
 import static fr.insa.zins.classe.Module.afficheTousModules;
+import static fr.insa.zins.classe.Module.deleteModule;
 import static fr.insa.zins.classe.Module.trouveModule;
 import fr.insa.zins.classe.Personne.PersonneAlreadyExistsException;
-import fr.insa.zins.classe.Personne.PersonneNotFoundException;
 import static fr.insa.zins.classe.Personne.afficheToutesPersonnes;
+import static fr.insa.zins.classe.Personne.deletePersonne;
 import static fr.insa.zins.classe.Personne.trouvePersonne;
 import fr.insa.zins.utils.Console;
 import java.sql.Connection;
@@ -229,7 +233,7 @@ public static Connection connectPostgresql(String host, int port,
                create table Voeux(
                 id integer primary key generated always as identity,
                 idEtudiant INTEGER not null,
-               idGM INTEGER not null, 
+                idGM INTEGER not null, 
                 choix1 INTEGER,
                 choix2 INTEGER,
                 choix3 INTEGER
@@ -396,51 +400,41 @@ public static Connection connectPostgresql(String host, int port,
             return nouvellesCles.getInt(1);
         }
     }
-
-    public static void ajouteChoix1(Connection con, String nom, int choix)
-            throws SQLException, EtudiantNotFoundException 
-    {
-        int idEtudiant = trouveEtudiant(con, nom);
-        if (idEtudiant == -1) {
-            throw new EtudiantNotFoundException(nom);
+    public static int createEtudiant(Connection con, String nom, String prenom, String email, String mdp)
+            throws SQLException, EtudiantAlreadyExistsException {
+        if (trouveEtudiant(con, nom) != -1) {
+            throw new EtudiantAlreadyExistsException(nom);
         }
         try ( PreparedStatement pst = con.prepareStatement(
-                "select id from Voeux where choix1 = ?")) {
-            con.setAutoCommit(false);
-            pst.setInt(1, choix);
-            ResultSet rsChoix = pst.executeQuery();
-            int idVoeux;
-            if (rsChoix.next()) {
-                idVoeux = rsChoix.getInt(1);
-            } else {
-                try ( PreparedStatement pst2 = con.prepareStatement(
-                        "insert into Voeux (choix1) values (?)",
-                        PreparedStatement.RETURN_GENERATED_KEYS)) {
-                    pst2.setInt(1, choix);
-                    pst2.executeUpdate();
-                    // ci dessous : retrouver l'identificateur qui vient d'être crée
-                    ResultSet nouvellesCles = pst2.getGeneratedKeys();
-                    // ici, il n'y a qu'une nouvelle clé.
-                    // s'il y avait plusieurs objets créés, on pourrait retrouver tous
-                    // les id correspondants en incluant le "next" dans un while
-                    nouvellesCles.next();
-                    idVoeux = nouvellesCles.getInt(1);
-                }
+                """
+        insert into Personne (nom,prenom,email,mdp)
+          values (?,?,?,?)
+        """,PreparedStatement.RETURN_GENERATED_KEYS)) {
+            pst.setString(1, nom);
+            pst.setString(2, prenom);
+            pst.setString(3, email);
+            pst.setString(4, mdp);            
+            pst.executeUpdate();
+            // ci dessous : retrouver l'identificateur qui vient d'être crée
+            ResultSet nouvellesCles = pst.getGeneratedKeys();
+            // ici, il n'y a qu'une nouvelle clé.
+            // s'il y avait plusieurs objets créés, on pourrait retrouver tous
+            // les id correspondants en incluant le "next" dans un while
+            nouvellesCles.next();
+            try(PreparedStatement pst1 = con.prepareStatement(
+                """
+                insert into Etudiant (idPersonne)
+                   values (?)
+                """,PreparedStatement.RETURN_GENERATED_KEYS)) {
+                
+                pst.setInt(1, nouvellesCles.getInt("Personne.id"));
+               
             }
-            /*try ( PreparedStatement pst3 = con.prepareStatement(
-                    "insert into PersonSurnoms (idPerson,idSurnom) values (?,?)")) {
-                pst3.setInt(1, idPerson);
-                pst3.setInt(2, idSurnom);
-                pst3.executeUpdate();
-            }*/
-            con.commit();
-        } catch (SQLException ex) {
-            con.rollback();
-            throw ex;
-        } finally {
-            con.setAutoCommit(true);
+            return nouvellesCles.getInt(1);
         }
+        
     }
+
 
     public static void creeDonneesTest(Connection con) throws SQLException {
         String[][] donnees = new String[][]{
@@ -454,6 +448,36 @@ public static Connection connectPostgresql(String host, int port,
                 createPersonne(con, p[0],p[1],p[2],p[3]);
 
             } catch (PersonneAlreadyExistsException ex) {
+                throw new Error(ex);
+            }
+        }
+        String [][] donneesGroupeModule = new String[][]{
+            //forme :{nom,description
+            {"groupemodule1","description gmodule1"},
+            {"groupemodule2","description gmodule2"},
+            {"groupemodule3","description gmodule3"} };
+        
+        for (String[] p : donneesGroupeModule) {
+            try {
+                createGroupeModule(con, p[0],p[1]);
+
+            } catch (GroupeModuleAlreadyExistsException ex) {
+                throw new Error(ex);
+            }
+        }
+        String [][] donneesModule = new String[][]{
+            //forme :{nom,description, idgm
+            {"module1","description module1","1"},
+            {"module2","description module2","1"},
+            {"module3","description module3","2"}, 
+            {"module4",null,"2"}};
+        
+        for (String[] p : donneesModule) {
+            //java.sql.Date d = java.sql.Date.valueOf(p[1]);
+            try {
+                createModule(con, p[0],p[1],Integer.parseInt(p[2]));
+
+            } catch (ModuleAlreadyExistsException ex) {
                 throw new Error(ex);
             }
         }
@@ -497,12 +521,17 @@ public static Connection connectPostgresql(String host, int port,
             System.out.println("2) ajouter une personne");
             System.out.println("3) ajouter un module");
             System.out.println("4) ajouter un groupe de module");
-            //System.out.println("3) ajouter un surnom à une personne");
             System.out.println("5) afficher toutes les personnes");
             System.out.println("6) afficher tous les modules");
             System.out.println("7) afficher toutes les groupes de modules");
-           // System.out.println("5) afficher correspondances nom-surnom");
             System.out.println("8) tout supprimer");
+            System.out.println("9) modifier nom d'un module"); //marche pas 
+            //System.out.println("10) trouver id module : ");
+            System.out.println("11) effacer un module");
+            System.out.println("12) effacer une personne");
+            System.out.println("13) effacer un groupe de module");
+            System.out.println("14) modifier description d'un module");
+            System.out.println("15) ajouter un étudiant");
             rep = Console.entreeInt("Votre choix : ");
 
            if (rep == 1) {
@@ -548,19 +577,47 @@ public static Connection connectPostgresql(String host, int port,
                 } catch (Exception ex) {
                     System.out.println("Impossible d'effacer le schema");
                 }
+            }else if (rep ==9){
+                String nom = Console.entreeString("nom : ");
+                String nomModifier = Console.entreeString("nom modifié : ");
+                try{
+                ModifNomModule(con, nom,nomModifier);
+                } catch (Exception ex) {
+                    System.out.println("Impossible de modifier le nom du module");
+                }
+            }else if (rep ==10){
+                String nom = Console.entreeString("nom : ");
+                trouveModule(con,nom);
+            }else if (rep ==11){
+                String nom = Console.entreeString("nom : ");
+                deleteModule(con,nom);
+            }else if (rep ==12){
+                String nom = Console.entreeString("nom : ");
+                deletePersonne(con,nom);
+            }else if (rep ==13){
+                String nom = Console.entreeString("nom : ");
+                deleteGroupeModule(con,nom);
+            }else if (rep ==14){
+                String nom = Console.entreeString("nom : ");
+                String description = Console.entreeString("description à ajouter : ");
+                ModifDescriptionModule(con, nom, description);   
+            }else if (rep ==15){
+                String nom = Console.entreeString("nom : ");
+                String prenom = Console.entreeString("prenom :");
+                String email = Console.entreeString("email : ");
+                String mdp = Console.entreeString("mdp: ");
+                try {
+                    createEtudiant(con, nom, prenom,email,mdp);
+                } catch (EtudiantAlreadyExistsException ex) {
+                    System.out.println("Impossible : le nom existe déjà");
+                }
             }
         }
     }
 
     public static void main(String[] args) {
        try ( Connection con = testConnect()) {
-                
-            //createSchema(con);
-            //deleteSchema(con);
-                
-                //EnregistrerUnFichier();
 
-                
                 //createPersonne(con,"Zins","Sabine","sabine.zins@insa-strasbourg.fr", "pass");
             menuPrincipal(con);
         } catch (Exception ex) {
