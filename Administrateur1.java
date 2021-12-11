@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package fr.insa.quarteroni.Interface;
 
 import com.vaadin.flow.component.button.Button;
@@ -49,7 +44,7 @@ public class Administrateur1 extends VerticalLayout {
 
 this.valider.addClickListener((e) -> {
    
-    this.main.changeContenu(new Etudiant3Choix1(this.main));
+    this.main.changeContenu(new Administrateur2(this.main));
     this.main.avancerBarre(this.main);
     
 
