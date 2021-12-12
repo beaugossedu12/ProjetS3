@@ -5,7 +5,11 @@
  */
 package fr.insa.zins.classe;
 
+import fr.insa.zins.classe.Administrateur.AdministrateurAlreadyExistsException;
+import static fr.insa.zins.classe.Administrateur.trouveAdministrateur;
 import fr.insa.zins.classe.Etudiant.EtudiantAlreadyExistsException;
+import static fr.insa.zins.classe.Etudiant.afficheTousEtudiants;
+import static fr.insa.zins.classe.Etudiant.deleteEtudiant;
 import static fr.insa.zins.classe.Etudiant.trouveEtudiant;
 import fr.insa.zins.classe.GroupeModule.GroupeModuleAlreadyExistsException;
 import static fr.insa.zins.classe.GroupeModule.afficheTousGroupeModule;
@@ -17,17 +21,19 @@ import fr.insa.zins.classe.Module.ModuleAlreadyExistsException;
 import static fr.insa.zins.classe.Module.afficheTousModules;
 import static fr.insa.zins.classe.Module.deleteModule;
 import static fr.insa.zins.classe.Module.trouveModule;
-import fr.insa.zins.classe.Personne.PersonneAlreadyExistsException;
-import static fr.insa.zins.classe.Personne.afficheToutesPersonnes;
-import static fr.insa.zins.classe.Personne.deletePersonne;
-import static fr.insa.zins.classe.Personne.trouvePersonne;
+import static fr.insa.zins.classe.Voeux.chargeVoeux;
+
 import fr.insa.zins.utils.Console;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import javax.swing.JFileChooser;
 
 /**
  *
@@ -78,11 +84,25 @@ public static Connection connectPostgresql(String host, int port,
         }
     }*/
 
-    public static void createTablePersonne(Connection con) throws SQLException {
+    public static void createTableEtudiant (Connection con) throws SQLException {
         try ( Statement st = con.createStatement()) {
             st.executeUpdate(
                     """
-               create table Personne(
+               create table Etudiant(
+                 id integer primary key generated always as identity,
+                 nom varchar(50) not null,
+                 prenom varchar(50),
+                 email varchar(50),
+                 mdp varchar(50) 
+               )
+               """);
+        }
+    }
+    public static void createTableAdministrateur (Connection con) throws SQLException {
+        try ( Statement st = con.createStatement()) {
+            st.executeUpdate(
+                    """
+               create table Administrateur(
                  id integer primary key generated always as identity,
                  nom varchar(50) not null,
                  prenom varchar(50),
@@ -93,26 +113,7 @@ public static Connection connectPostgresql(String host, int port,
         }
     }
 
-    public static void createTableEtudiant(Connection con) throws SQLException {
-        try ( Statement st = con.createStatement()) {
-            st.executeUpdate(
-                    """
-               create table Etudiant(
-                 id integer primary key generated always as identity,
-               )
-               """);
-        }
-    }
-    public static void createTableAdministrateur(Connection con) throws SQLException {
-        try ( Statement st = con.createStatement()) {
-            st.executeUpdate(
-                    """
-               create table Administrateur(
-                 id integer primary key generated always as identity,
-               )
-               """);
-        }
-    }
+
     public static void createTableModule(Connection con) throws SQLException {
         try ( Statement st = con.createStatement()) {
             st.executeUpdate(
@@ -150,6 +151,17 @@ public static Connection connectPostgresql(String host, int port,
                """);
         }
     } 
+        public static void createTableSemestre(Connection con) throws SQLException {
+        try ( Statement st = con.createStatement()) {
+            st.executeUpdate(
+                    """
+                create table Semestre(
+                id integer primary key generated always as identity,
+                annee integer not null,
+               numero integer
+               """);
+        }
+    } 
     public static void createSchema(Connection con) throws SQLException {
         try ( Statement st = con.createStatement()) {
             // on veut que le schema soit entierement créé ou pas du tout
@@ -158,7 +170,27 @@ public static Connection connectPostgresql(String host, int port,
             con.setAutoCommit(false);
             st.executeUpdate(
                     """
-               create table Personne(
+               create table Etudiant(
+                 id integer primary key generated always as identity,
+                 nom varchar(50) not null,
+                prenom varchar(50),
+                email varchar(50),
+                mdp varchar(50) 
+                
+               )
+               """);
+            st.executeUpdate(
+                    """
+               create table Semestre(
+                 id integer primary key generated always as identity,
+                 annee integer not null,
+                numero integer
+                
+               )
+               """);
+            st.executeUpdate(
+                    """
+               create table Administrateur(
                  id integer primary key generated always as identity,
                  nom varchar(50) not null,
                 prenom varchar(50),
@@ -193,40 +225,7 @@ public static Connection connectPostgresql(String host, int port,
                    on delete restrict
                    on update restrict
                """);
-            
 
-            st.executeUpdate(
-                    """
-               create table Etudiant(
-                id integer primary key generated always as identity,
-               idPersonne INTEGER not null
-              )
-               """);
-            st.executeUpdate(
-                    """
-               alter table Etudiant 
-                 add constraint fk_idPersonne_id
-                 foreign key(idPersonne)
-                 references Personne(id)
-                   on delete restrict
-                   on update restrict
-               """);
-            st.executeUpdate( 
-                    """
-               create table Administrateur( 
-               id integer primary key generated always as identity,
-               idPersonne integer not null
-              )
-               """);
-            st.executeUpdate(
-                    """
-               alter table Administrateur 
-                 add constraint fk_idPersonne_id
-                 foreign key(idPersonne)
-                 references Personne(id)
-                   on delete restrict
-                   on update restrict
-               """);
             
             st.executeUpdate(
                     """
@@ -286,17 +285,7 @@ public static Connection connectPostgresql(String host, int port,
                alter table Module 
                  drop constraint fk_idGM_id
                """);
-            st.executeUpdate(
-                    """
-               alter table Etudiant 
-                 drop constraint fk_idPersonne_id
-               """);
-            
-            st.executeUpdate(
-                    """
-               alter table Administrateur 
-                 drop constraint fk_idPersonne_id
-               """);
+
             st.executeUpdate(
                     """
                alter table Voeux
@@ -308,7 +297,7 @@ public static Connection connectPostgresql(String host, int port,
                alter table Voeux
                  drop constraint fk_idGM_id
                """);
-            st.executeUpdate("drop table Personne");
+
            st.executeUpdate("drop table Module");
            st.executeUpdate("drop table GroupeModule");
            st.executeUpdate("drop table Voeux");
@@ -324,14 +313,38 @@ public static Connection connectPostgresql(String host, int port,
         }
     }
 
-    public static int createPersonne(Connection con, String nom, String prenom, String email, String mdp)
-            throws SQLException, PersonneAlreadyExistsException {
-        if (trouvePersonne(con, nom) != -1) {
-            throw new PersonneAlreadyExistsException(nom);
+    public static int createEtudiant(Connection con, String nom, String prenom, String email, String mdp)
+            throws SQLException, EtudiantAlreadyExistsException {
+        if (trouveEtudiant(con, nom) != -1) {
+            throw new EtudiantAlreadyExistsException(nom);
         }
         try ( PreparedStatement pst = con.prepareStatement(
                 """
-        insert into Personne (nom,prenom,email,mdp)
+        insert into Etudiant (nom,prenom,email,mdp)
+          values (?,?,?,?)
+        """,PreparedStatement.RETURN_GENERATED_KEYS)) {
+            pst.setString(1, nom);
+            pst.setString(2, prenom);
+            pst.setString(3, email);
+            pst.setString(4, mdp);            
+            pst.executeUpdate();
+            // ci dessous : retrouver l'identificateur qui vient d'être crée
+            ResultSet nouvellesCles = pst.getGeneratedKeys();
+            // ici, il n'y a qu'une nouvelle clé.
+            // s'il y avait plusieurs objets créés, on pourrait retrouver tous
+            // les id correspondants en incluant le "next" dans un while
+            nouvellesCles.next();
+            return nouvellesCles.getInt(1);
+        }
+    }
+    public static int createAdministrateur(Connection con, String nom, String prenom, String email, String mdp)
+            throws SQLException, AdministrateurAlreadyExistsException {
+        if (trouveAdministrateur(con, nom) != -1) {
+            throw new AdministrateurAlreadyExistsException(nom);
+        }
+        try ( PreparedStatement pst = con.prepareStatement(
+                """
+        insert into Administrateur (nom,prenom,email,mdp)
           values (?,?,?,?)
         """,PreparedStatement.RETURN_GENERATED_KEYS)) {
             pst.setString(1, nom);
@@ -400,20 +413,20 @@ public static Connection connectPostgresql(String host, int port,
             return nouvellesCles.getInt(1);
         }
     }
-    public static int createEtudiant(Connection con, String nom, String prenom, String email, String mdp)
-            throws SQLException, EtudiantAlreadyExistsException {
-        if (trouveEtudiant(con, nom) != -1) {
-            throw new EtudiantAlreadyExistsException(nom);
-        }
-        try ( PreparedStatement pst = con.prepareStatement(
+    public static int createVoeux(Connection con, int idEtudiant,int idGM,int choix1,int choix2,int choix3) 
+            throws SQLException{
+
+
+        try ( PreparedStatement pst = con.prepareStatement( 
                 """
-        insert into Personne (nom,prenom,email,mdp)
-          values (?,?,?,?)
+        insert into Voeux (idEtudiant,idGM,choix1,choix2,choix3) 
+          values (?,?,?,?,?)
         """,PreparedStatement.RETURN_GENERATED_KEYS)) {
-            pst.setString(1, nom);
-            pst.setString(2, prenom);
-            pst.setString(3, email);
-            pst.setString(4, mdp);            
+            pst.setInt(1, idEtudiant);
+            pst.setInt(2,idGM);
+            pst.setInt(3,choix1);
+            pst.setInt(4,choix2);
+            pst.setInt(5,choix3);
             pst.executeUpdate();
             // ci dessous : retrouver l'identificateur qui vient d'être crée
             ResultSet nouvellesCles = pst.getGeneratedKeys();
@@ -421,19 +434,10 @@ public static Connection connectPostgresql(String host, int port,
             // s'il y avait plusieurs objets créés, on pourrait retrouver tous
             // les id correspondants en incluant le "next" dans un while
             nouvellesCles.next();
-            try(PreparedStatement pst1 = con.prepareStatement(
-                """
-                insert into Etudiant (idPersonne)
-                   values (?)
-                """,PreparedStatement.RETURN_GENERATED_KEYS)) {
-                
-                pst.setInt(1, nouvellesCles.getInt("Personne.id"));
-               
-            }
             return nouvellesCles.getInt(1);
         }
-        
     }
+
 
 
     public static void creeDonneesTest(Connection con) throws SQLException {
@@ -443,11 +447,11 @@ public static Connection connectPostgresql(String host, int port,
             {"Marley", "bob", "email2","mdp2"},
             {"SansSurnom", "bob", "email3","mdp3"}};
         for (String[] p : donnees) {
-            //java.sql.Date d = java.sql.Date.valueOf(p[1]);
+           
             try {
-                createPersonne(con, p[0],p[1],p[2],p[3]);
+                createEtudiant(con, p[0],p[1],p[2],p[3]);
 
-            } catch (PersonneAlreadyExistsException ex) {
+            } catch (EtudiantAlreadyExistsException ex) {
                 throw new Error(ex);
             }
         }
@@ -470,16 +474,32 @@ public static Connection connectPostgresql(String host, int port,
             {"module1","description module1","1"},
             {"module2","description module2","1"},
             {"module3","description module3","2"}, 
-            {"module4",null,"2"}};
+            {"module4",null,"2"},
+            {"module5","description module5","1"},
+            {"module6","description module6","2"}};
+            
         
         for (String[] p : donneesModule) {
-            //java.sql.Date d = java.sql.Date.valueOf(p[1]);
+            
             try {
                 createModule(con, p[0],p[1],Integer.parseInt(p[2]));
 
             } catch (ModuleAlreadyExistsException ex) {
                 throw new Error(ex);
             }
+        }
+        String [][] donneesVoeux = new String[][]{
+            //forme :{idEtudiant,idGM, choix1,choix2,choix3
+            {"1","1","1","2","5"},
+            {"1","2","4","3","6"},
+            {"2","1","2","1","5"}, 
+            {"2","2","3","4","6"}};
+        
+        for (String[] p : donneesVoeux) {
+       
+            createVoeux(con,Integer.parseInt(p[0]),Integer.parseInt(p[1]),Integer.parseInt(p[2]),Integer.parseInt(p[3]),Integer.parseInt(p[4]));
+                
+
         }
     }
 
@@ -494,7 +514,7 @@ public static Connection connectPostgresql(String host, int port,
         creeDonneesTest(con);
     }
 
-    public static void afficheCorrespondances(Connection con) throws SQLException {
+    /*public static void afficheCorrespondances(Connection con) throws SQLException {
         try ( Statement st = con.createStatement()) {
             ResultSet res = st.executeQuery(
                     """
@@ -510,7 +530,7 @@ public static Connection connectPostgresql(String host, int port,
             }
         }
 
-    }
+    }*/
 
     public static void menuPrincipal(Connection con) throws SQLException {
         int rep = -1;
@@ -518,20 +538,20 @@ public static Connection connectPostgresql(String host, int port,
             System.out.println("Menu Principal");
             System.out.println("--------------");
             System.out.println("1) (re)créer toute la BdD");
-            System.out.println("2) ajouter une personne");
+            System.out.println("2) ajouter un etudiant");
             System.out.println("3) ajouter un module");
             System.out.println("4) ajouter un groupe de module");
-            System.out.println("5) afficher toutes les personnes");
+            System.out.println("5) afficher tous le étudiants");
             System.out.println("6) afficher tous les modules");
             System.out.println("7) afficher toutes les groupes de modules");
             System.out.println("8) tout supprimer");
-            System.out.println("9) modifier nom d'un module"); //marche pas 
+            System.out.println("9) modifier nom d'un module"); 
             //System.out.println("10) trouver id module : ");
             System.out.println("11) effacer un module");
-            System.out.println("12) effacer une personne");
+            System.out.println("12) effacer un etudiant");
             System.out.println("13) effacer un groupe de module");
             System.out.println("14) modifier description d'un module");
-            System.out.println("15) ajouter un étudiant");
+            
             rep = Console.entreeInt("Votre choix : ");
 
            if (rep == 1) {
@@ -542,8 +562,8 @@ public static Connection connectPostgresql(String host, int port,
                 String email = Console.entreeString("email : ");
                 String mdp = Console.entreeString("mdp: ");
                 try {
-                    createPersonne(con, nom, prenom,email,mdp);
-                } catch (PersonneAlreadyExistsException ex) {
+                    createEtudiant(con, nom, prenom,email,mdp);
+                } catch (EtudiantAlreadyExistsException ex) {
                     System.out.println("Impossible : le nom existe déjà");
                 }
                 
@@ -566,7 +586,7 @@ public static Connection connectPostgresql(String host, int port,
                     System.out.println("Impossible : le groupe de module existe déjà");
                 }
             } else if (rep == 5) {
-                afficheToutesPersonnes(con);
+                afficheTousEtudiants(con);
             } else if (rep == 6) {
                 afficheTousModules(con);
             }else if (rep == 7) {
@@ -593,7 +613,7 @@ public static Connection connectPostgresql(String host, int port,
                 deleteModule(con,nom);
             }else if (rep ==12){
                 String nom = Console.entreeString("nom : ");
-                deletePersonne(con,nom);
+                deleteEtudiant(con,nom);
             }else if (rep ==13){
                 String nom = Console.entreeString("nom : ");
                 deleteGroupeModule(con,nom);
@@ -601,23 +621,113 @@ public static Connection connectPostgresql(String host, int port,
                 String nom = Console.entreeString("nom : ");
                 String description = Console.entreeString("description à ajouter : ");
                 ModifDescriptionModule(con, nom, description);   
-            }else if (rep ==15){
-                String nom = Console.entreeString("nom : ");
-                String prenom = Console.entreeString("prenom :");
-                String email = Console.entreeString("email : ");
-                String mdp = Console.entreeString("mdp: ");
-                try {
-                    createEtudiant(con, nom, prenom,email,mdp);
-                } catch (EtudiantAlreadyExistsException ex) {
-                    System.out.println("Impossible : le nom existe déjà");
-                }
+           
             }
         }
     }
 
-    public static void main(String[] args) {
+   public static void test() {
        try ( Connection con = testConnect()) {
+         JFileChooser filechoose = new JFileChooser();
+        // Créer un JFileChooser
+        
+        filechoose.setCurrentDirectory(new File(".")); // Le répertoire
+        //source du JFileChooser est le répertoire d'où est lancé
+        //notre programme
+        String approve = new String("ENREGISTRER");
+        // Le bouton pour valider l'enregistrement portera la
+        //mention ENREGSITRER
+        int resultatEnregistrer = filechoose.showDialog(filechoose, approve); // Pour afficher le JFileChooser...
+        if (resultatEnregistrer ==JFileChooser.APPROVE_OPTION) // Si l'utilisateur clique
+        //sur le bouton ENREGSITRER
+        { String monFichier= new String(filechoose.getSelectedFile().toString());
+        // Récupérer le nom du fichier qu'il a spécifié
+            if(monFichier.endsWith(".txt")|| monFichier.endsWith(".TXT")) {;}
+        // Si ce nom de fichier finit par .txt ou .TXT, ne rien faire et passer à
+        //a suite
+             // else{(monFichier = monFichier+ ".txt");}
+        // Sinon renommer le fichier pour qu'il porte l'extension .txt
+            { 
+//BufferedWriter etudiants=new BufferedWriter(new FileWriter("Etudiants.txt", true));
+                try{
 
+                    //FileWriter lu=new FileWriter(monFichier);
+                    BufferedWriter fichier1=new BufferedWriter(new FileWriter("monFichier.txt", true));//new FileWriter("treillis.txt", true));
+                    //fichier1.write(creationFichier()); 
+                    try ( Statement st = con.createStatement()) {
+                        String sql = "select * from GroupeModule";
+  
+    
+                        try(PreparedStatement pstmt = con.prepareStatement(sql,ResultSet.TYPE_SCROLL_INSENSITIVE,
+                            ResultSet.CONCUR_READ_ONLY);){
+                          ResultSet rs = pstmt.executeQuery();
+                            rs.last();
+                            fichier1.write("Nombre de groupe de module:"+rs.getRow());
+                            fichier1.newLine();
+                           }
+                        String sql2 = "select * from Module where idGM = '1'";
+                         try(PreparedStatement pstmt = con.prepareStatement(sql2,ResultSet.TYPE_SCROLL_INSENSITIVE,
+                            ResultSet.CONCUR_READ_ONLY);){
+                               ResultSet rs = pstmt.executeQuery();
+
+                              rs.last();
+                              fichier1.write("Nombre de choix pour chaque groupe de module:"+rs.getRow()); 
+                              fichier1.newLine();
+                         }
+                        fichier1.write("MODULES");
+                        fichier1.newLine();
+                        ResultSet res3 = st.executeQuery("select * from Module");
+                        while (res3.next()) {
+                            int id = res3.getInt("id");
+                            int idGM = res3.getInt("idGM");
+
+                            fichier1.write(id + ";" + idGM);
+                            fichier1.newLine();
+                        }
+                        fichier1.write("FINMODULES");
+                        fichier1.newLine();
+                        fichier1.write("CHOIX");
+                        fichier1.newLine();
+
+                        /*ResultSet res4 = st.executeQuery(
+                                """
+                                select Etudiant.id, choix1,choix2, choix3 from Etudiant 
+                                join Voeux on Etudiant.id=Voeux.idEtudiant 
+                                """);*/
+                        ResultSet res4 = st.executeQuery("select * from Voeux");
+                       
+                        while (res4.next()){ 
+                            int id = res4.getInt("idEtudiant");
+                            fichier1.write(id);
+                             // on peut accéder à une colonne par son nom
+;
+                            int choix1=res4.getInt("choix1");
+                            int choix2=res4.getInt("choix2");
+                            int choix3=res4.getInt("choix3");
+                            fichier1.write(";" + choix1+","+choix2+","+choix3);
+                            res4.next();
+                            int choix21=res4.getInt("choix1");
+                            int choix22=res4.getInt("choix2");
+                            int choix23=res4.getInt("choix3");
+                            fichier1.write(";" + choix21+","+choix22+","+choix23);
+                           
+                            
+                            fichier1.newLine(); 
+                        }
+                    }
+                    fichier1.write("FINCHOIX");
+                    fichier1.newLine();
+                    fichier1.write("COUTS");
+                    fichier1.newLine();
+                    fichier1.write("FINCOUTS");
+                    fichier1.close();
+                }catch(Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        
+    
                 //createPersonne(con,"Zins","Sabine","sabine.zins@insa-strasbourg.fr", "pass");
             menuPrincipal(con);
         } catch (Exception ex) {

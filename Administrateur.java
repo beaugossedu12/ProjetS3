@@ -15,12 +15,12 @@ import java.sql.Statement;
  *
  * @author sabin
  */
-public class Etudiant {
-    public static void afficheTousEtudiants(Connection con)throws SQLException 
+public class Administrateur {
+        public static void afficheTousAdministrateurs(Connection con)throws SQLException 
     {
         try ( Statement st = con.createStatement()) {
             ResultSet res = st.executeQuery(
-                    "select * from Etudiant");
+                    "select * from Administrateur");
             while (res.next()) {
                 // on peut accéder à une colonne par son nom
                 int id = res.getInt("id");
@@ -36,26 +36,26 @@ public class Etudiant {
         }
     }
 
-    public static class EtudiantNotFoundException extends Exception 
+    public static class AdministrateurNotFoundException extends Exception 
     {
 
-        public EtudiantNotFoundException(String nom) {
-            super("La Etudiant de nom \"" + nom + "\" n'existe pas");
+        public AdministrateurNotFoundException(String nom) {
+            super("La Administrateur de nom \"" + nom + "\" n'existe pas");
         }
     }
 
-    public static class EtudiantAlreadyExistsException extends Exception 
+    public static class AdministrateurAlreadyExistsException extends Exception 
     {
 
-        public EtudiantAlreadyExistsException(String nom) {
-            super("La Etudiant de nom \"" + nom + "\" existe déjà");
+        public AdministrateurAlreadyExistsException(String nom) {
+            super("La Administrateur de nom \"" + nom + "\" existe déjà");
         }
     }
     
-    public static int trouveEtudiant(Connection con, String nom)throws SQLException
+    public static int trouveAdministrateur(Connection con, String nom)throws SQLException
     {
         try ( PreparedStatement pst = con.prepareStatement(
-                "select id from Etudiant where nom = ?")) {
+                "select id from Administrateur where nom = ?")) {
             pst.setString(1, nom);
             ResultSet findP = pst.executeQuery();
             if (!findP.next()) {
@@ -65,10 +65,10 @@ public class Etudiant {
         }
     }
     
-    public static void deleteEtudiant(Connection con,String nom) throws SQLException
+    public static void deleteAdministrateur(Connection con,String nom) throws SQLException
     {
         try ( PreparedStatement pst = con.prepareStatement( 
-        "delete from Etudiant where nom = ?")){
+        "delete from Administrateur where nom = ?")){
         pst.setString(1, nom);
         pst.executeUpdate();   
         //con.commit();
@@ -76,11 +76,11 @@ public class Etudiant {
             System.out.println(ex);
         }
     }
-    public static void ModifEmailEtudiant (Connection con, String nom, String emailModifie) throws SQLException
+    public static void ModifEmailAdministrateur (Connection con, String nom, String emailModifie) throws SQLException
     {
         try ( PreparedStatement pst = con.prepareStatement(
                 """
-                update Etudiant
+                update Administrateur
                 set email = ?
                 where nom = ?
                 """)){
@@ -94,11 +94,11 @@ public class Etudiant {
                         
     }
     
-    public static void ModifmdpEtudiant (Connection con, String nom, String mdpModifie) throws SQLException
+    public static void ModifmdpAdministrateur (Connection con, String nom, String mdpModifie) throws SQLException
     {
         try ( PreparedStatement pst = con.prepareStatement(
                 """
-                update Etudiant
+                update Administrateur
                 set mdp = ?
                 where nom = ?
                 """)){
@@ -111,5 +111,4 @@ public class Etudiant {
         }
                         
     }
-    
 }
