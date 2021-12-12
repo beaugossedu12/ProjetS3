@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.insa.quarteroni.Interface;
+package fr.insa.zins.testvaadin;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.charts.model.Label;
@@ -13,7 +13,7 @@ import com.vaadin.flow.component.progressbar.ProgressBar;
 
 /**
  *
- * @author arthurquarteroni
+ * @author sabin
  */
 public class Accueil extends VerticalLayout {
 
@@ -45,14 +45,8 @@ public class Accueil extends VerticalLayout {
         this.administrateur.addClickListener((e) -> {
             this.main.changeContenu(new Administrateur1(this.main));
             this.main.avancerBarre(this.main);
-          
-            
-            
-            
+    
         });
-   
-
-
 
     }
 }

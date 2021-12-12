@@ -3,13 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.insa.quarteroni.Interface;
+package fr.insa.zins.testvaadin;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.charts.model.Label;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -24,16 +23,28 @@ import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import java.awt.Panel;
 
 /**
  *
- * @author arthurquarteroni
+ * @author sabin
  */
 @Route("")
-@PageTitle("VuePrincipale")
-public class VuePrincipale extends VerticalLayout {
-
+@PageTitle("ADE")
+public class VuePrincipale extends VerticalLayout{
+    
+   /* private Button vbCoucou;
+    private Login log;
+    
+    public VuePrincipale() {
+        this.vbCoucou = new Button("dis Coucou");
+        this.vbCoucou.addClickListener((t) -> {
+            Notification.show("Coucou");
+        });
+        this.add(this.vbCoucou);
+        this.log = new Login();
+        this.add(this.log);
+    }
+}*/
     private HorizontalLayout entete;
     private HorizontalLayout reste;
     private VerticalLayout menugauche;

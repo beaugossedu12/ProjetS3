@@ -1,58 +1,63 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
-package fr.insa.quarteroni.Interface;
+package fr.insa.zins.testvaadin;
 
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.function.ValueProvider;
+import static fr.insa.zins.classe.bdd2.testConnect;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  *
- * @author arthurquarteroni
+ * @author sabin
  */
 public class Administrateur2 extends VerticalLayout {
 
     private VuePrincipale main;
-    private Button ajouter;
-    private Button supprimer;
-    private Button modifier;
-    private Grid tableau;
+    private Button etudiant;
+    private Button module;
+    private Button groupeModule;
+
 
     public Administrateur2(VuePrincipale main) {
-
+        this.main = main;
         
-        this.tableau = new Grid();
-        ValueProvider renderer = null;
-        tableau.addColumn(renderer);
-        
-                
-        this.ajouter = new Button("Ajouter un étudiant");
-        this.add(this.ajouter);
-        ajouter.setWidthFull();
+            this.etudiant = new Button("Etudiant");
+            this.add(this.etudiant);
+            etudiant.setWidthFull();
 
-        this.ajouter.addClickListener((e) -> {
+            this.etudiant.addClickListener((e) -> {
+                try ( Connection con = testConnect()) {
+                    this.main.changeContenu(new ModifEtudiant(this.main));
+                this.main.avancerBarre(this.main);  
+                } catch (SQLException ex) {
+                    throw new Error(ex);
+                }
+            });
+            this.module = new Button("Module");
+            this.add(this.module);
+            module.setWidthFull();
 
-            //méthode à appliquer au clic du bouton 
-        });
-        this.supprimer = new Button("Supprimer un étudiant");
-        this.add(this.supprimer);
-        supprimer.setWidthFull();
+            this.module.addClickListener((e) -> {
+                try ( Connection con1 = testConnect()) {
+                    this.main.changeContenu(new ModifModule(this.main));
+                    this.main.avancerBarre(this.main);
+                } catch (SQLException ex) {
+                    throw new Error(ex);
+                }
+            });
+            this.groupeModule = new Button("Groupe Module");
+            this.add(this.groupeModule);
+            groupeModule.setWidthFull();
 
-        this.supprimer.addClickListener((e) -> {
-
-            //méthode à appliquer au clic du bouton 
-        });
-        this.modifier = new Button("Modifier des informations");
-        this.add(this.modifier);
-        modifier.setWidthFull();
-
-        this.modifier.addClickListener((e) -> {
-
-            //méthode à appliquer au clic du bouton 
-        });
+            this.groupeModule.addClickListener((e) -> {
+                this.main.changeContenu(new ModifGroupeModule(this.main));
+                this.main.avancerBarre(this.main);
+            });
 
     }
 

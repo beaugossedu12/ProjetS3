@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.insa.quarteroni.Interface;
+package fr.insa.zins.testvaadin;
 
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
 /**
  *
- * @author arthurquarteroni
+ * @author sabin
  */
 public class Etudiant3Choix1 extends VerticalLayout {
 
