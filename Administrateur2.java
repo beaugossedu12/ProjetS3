@@ -1,13 +1,13 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
  */
-package fr.insa.zins.testvaadin;
+package fr.insa.quarteroni.Interface;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import static fr.insa.zins.classe.bdd2.testConnect;
+import static fr.insa.quarteroni.BDD.bdd2.testConnect;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -55,10 +55,15 @@ public class Administrateur2 extends VerticalLayout {
             groupeModule.setWidthFull();
 
             this.groupeModule.addClickListener((e) -> {
-                this.main.changeContenu(new ModifGroupeModule(this.main));
+
+                this.main.changeContenu(newModifGroupeModule(this.main));
                 this.main.avancerBarre(this.main);
             });
 
+    }
+
+    private Component newModifGroupeModule(VuePrincipale main) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
 }

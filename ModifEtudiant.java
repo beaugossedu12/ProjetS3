@@ -1,16 +1,16 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package fr.insa.zins.testvaadin;
+package fr.insa.quarteroni.Interface;
 
+import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.function.ValueProvider;
-import static fr.insa.zins.classe.Etudiant.afficheTousEtudiants;
-import static fr.insa.zins.classe.bdd2.testConnect;
+import static fr.insa.quarteroni.BDD.Etudiant.afficheTousEtudiants;
+import static fr.insa.quarteroni.BDD.bdd2.testConnect;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -25,6 +25,7 @@ public class ModifEtudiant extends VerticalLayout {
     private Button modifier;
     private Button afficher;
     private Grid tableau;
+    private Button retour;
 
     public ModifEtudiant(VuePrincipale main)throws SQLException {
         this.main = main;
@@ -65,16 +66,22 @@ public class ModifEtudiant extends VerticalLayout {
             this.afficher = new Button("Afficher les étudiants");
             this.add(this.afficher);
             afficher.setWidthFull();
-
-            this.afficher.addClickListener((e) -> {
-                try (Connection con = testConnect()) {
-                 afficheTousEtudiants(con);
-                //méthode à appliquer au clic du bouton 
-                 } catch (SQLException ex) {
-            throw new Error(ex);
-                }
+            
+            this.retour = new Button("Retour");
+            this.add(this.retour);
+            this.retour.addClickListener((e) -> {
+               this.main.changeContenu(new Administrateur2(this.main));
+               this.main.reculerBarre(main);
             });
+
+            //this.afficher.addClickListener((e) -> {
+               // try (Connection con = testConnect()) {
+               //  afficheTousEtudiants(con);
+                //méthode à appliquer au clic du bouton 
+              //   } catch (SQLException ex) {
+            //throw new Error(ex);
+                }
+          //  });
 
     }
 
-}

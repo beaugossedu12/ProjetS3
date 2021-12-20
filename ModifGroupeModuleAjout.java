@@ -1,9 +1,8 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package fr.insa.zins.testvaadin;
+package fr.insa.quarteroni.Interface;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -14,14 +13,14 @@ import com.vaadin.flow.component.textfield.TextField;
  *
  * @author sabin
  */
-public class ModifGroupeModuleAjout  extends FormLayout{
+public class ModifGroupeModuleAjout extends FormLayout{
    private VuePrincipale main;
     
     private TextField nom;
     private TextField description;
 
  
-    private Button enregistrer;
+   private Button enregistrer;
 
     
     public ModifGroupeModuleAjout(VuePrincipale main) {
@@ -34,7 +33,7 @@ public class ModifGroupeModuleAjout  extends FormLayout{
         this.enregistrer= new Button("Enregistrer");
         
        
-        nom.setClearButtonVisible(true);
+       nom.setClearButtonVisible(true);
 
         description.setClearButtonVisible(true);
 
