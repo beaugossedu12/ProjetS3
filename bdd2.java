@@ -7,7 +7,8 @@ package fr.insa.zins.classe;
 
 import fr.insa.zins.classe.Administrateur.AdministrateurAlreadyExistsException;
 import static fr.insa.zins.classe.Administrateur.trouveAdministrateur;
-import fr.insa.zins.classe.Etudiant.EtudiantAlreadyExistsException;
+
+
 import static fr.insa.zins.classe.Etudiant.afficheTousEtudiants;
 import static fr.insa.zins.classe.Etudiant.deleteEtudiant;
 import static fr.insa.zins.classe.Etudiant.trouveEtudiant;
@@ -21,7 +22,7 @@ import fr.insa.zins.classe.Module.ModuleAlreadyExistsException;
 import static fr.insa.zins.classe.Module.afficheTousModules;
 import static fr.insa.zins.classe.Module.deleteModule;
 import static fr.insa.zins.classe.Module.trouveModule;
-import static fr.insa.zins.classe.Voeux.chargeVoeux;
+//import static fr.insa.zins.classe.Voeux.chargeVoeux;
 
 import fr.insa.zins.utils.Console;
 import java.io.BufferedWriter;
@@ -33,6 +34,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JFileChooser;
 
 /**
@@ -51,7 +54,7 @@ public static Connection connectPostgresql(String host, int port,
         con.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
         return con;
     }
-   public static Connection testConnect() {
+   public static Connection testConnect()  throws ClassNotFoundException, SQLException {
         Connection con = null;
         try {
             // teste la pr�sence du driver postgresql
@@ -179,7 +182,7 @@ public static Connection connectPostgresql(String host, int port,
                 
                )
                """);
-            st.executeUpdate(
+           /* st.executeUpdate(
                     """
                create table Semestre(
                  id integer primary key generated always as identity,
@@ -187,7 +190,7 @@ public static Connection connectPostgresql(String host, int port,
                 numero integer
                 
                )
-               """);
+               """);*/
             st.executeUpdate(
                     """
                create table Administrateur(
@@ -314,10 +317,10 @@ public static Connection connectPostgresql(String host, int port,
     }
 
     public static int createEtudiant(Connection con, String nom, String prenom, String email, String mdp)
-            throws SQLException, EtudiantAlreadyExistsException {
-        if (trouveEtudiant(con, nom) != -1) {
+            throws SQLException{//, EtudiantAlreadyExistsException {
+       /* if (trouveEtudiant(con, nom) != -1) {
             throw new EtudiantAlreadyExistsException(nom);
-        }
+        }*/
         try ( PreparedStatement pst = con.prepareStatement(
                 """
         insert into Etudiant (nom,prenom,email,mdp)
@@ -328,13 +331,16 @@ public static Connection connectPostgresql(String host, int port,
             pst.setString(3, email);
             pst.setString(4, mdp);            
             pst.executeUpdate();
-            // ci dessous : retrouver l'identificateur qui vient d'être crée
-            ResultSet nouvellesCles = pst.getGeneratedKeys();
-            // ici, il n'y a qu'une nouvelle clé.
-            // s'il y avait plusieurs objets créés, on pourrait retrouver tous
-            // les id correspondants en incluant le "next" dans un while
-            nouvellesCles.next();
-            return nouvellesCles.getInt(1);
+            // je peux alors récupérer les clés créées comme un result set :
+            try ( ResultSet rid = pst.getGeneratedKeys()) {
+                // et comme ici je suis sur qu'il y a une et une seule clé, je
+                // fait un simple next 
+                rid.next();
+                // puis je récupère la valeur de la clé créé qui est dans la
+                // première colonne du ResultSet
+                int id = rid.getInt(1);
+                return id;
+            }
         }
     }
     public static int createAdministrateur(Connection con, String nom, String prenom, String email, String mdp)
@@ -448,10 +454,23 @@ public static Connection connectPostgresql(String host, int port,
             {"SansSurnom", "bob", "email3","mdp3"}};
         for (String[] p : donnees) {
            
-            try {
+            //try {
                 createEtudiant(con, p[0],p[1],p[2],p[3]);
 
-            } catch (EtudiantAlreadyExistsException ex) {
+            /*} catch (EtudiantAlreadyExistsException ex) {
+                throw new Error(ex);
+            }*/
+        }
+        String[][] donneesAdmin = new String[][]{
+            // forme : {nom,prenom, email,mdp}
+            {" admin1", "titi","email1","mdp1"}};
+ 
+        for (String[] p : donneesAdmin) {
+           
+            try {
+                createAdministrateur(con, p[0],p[1],p[2],p[3]);
+
+            } catch (AdministrateurAlreadyExistsException ex) {
                 throw new Error(ex);
             }
         }
@@ -514,23 +533,21 @@ public static Connection connectPostgresql(String host, int port,
         creeDonneesTest(con);
     }
 
-    /*public static void afficheCorrespondances(Connection con) throws SQLException {
-        try ( Statement st = con.createStatement()) {
-            ResultSet res = st.executeQuery(
-                    """
-                    select nom,surnom from Personne
-                      join PersonSurnoms on Personne.id = idPersonne
-                      join Surnom on Surnom.id = idSurnom
-                    order by nom,surnom
-                    """);
-            while (res.next()) {
-                String nom = res.getString(1);
-                String surnom = res.getString(2);
-                System.out.println(nom + " : " + surnom);
+    public static List<Integer> getAllIds() throws SQLException, ClassNotFoundException {
+        try  ( Connection con = testConnect()){
+            try (Statement st = con.createStatement();
+                    ResultSet rres = st.executeQuery(
+                            "select id from Module")) {
+                List<Integer> res = new ArrayList<>();
+                while (rres.next()) {
+                    res.add(rres.getInt("id"));
+                }
+                return res;
             }
+        } catch (SQLException ex) {
+            throw new Error(ex);
         }
-
-    }*/
+    }
 
     public static void menuPrincipal(Connection con) throws SQLException {
         int rep = -1;
@@ -563,7 +580,7 @@ public static Connection connectPostgresql(String host, int port,
                 String mdp = Console.entreeString("mdp: ");
                 try {
                     createEtudiant(con, nom, prenom,email,mdp);
-                } catch (EtudiantAlreadyExistsException ex) {
+                } catch (SQLException ex) {
                     System.out.println("Impossible : le nom existe déjà");
                 }
                 
@@ -626,7 +643,7 @@ public static Connection connectPostgresql(String host, int port,
         }
     }
 
-   public static void test() {
+   public static void test(String[] args) {
        try ( Connection con = testConnect()) {
          JFileChooser filechoose = new JFileChooser();
         // Créer un JFileChooser
@@ -645,14 +662,14 @@ public static Connection connectPostgresql(String host, int port,
             if(monFichier.endsWith(".txt")|| monFichier.endsWith(".TXT")) {;}
         // Si ce nom de fichier finit par .txt ou .TXT, ne rien faire et passer à
         //a suite
-             // else{(monFichier = monFichier+ ".txt");}
+            //else{(monFichier = monFichier+ ".txt");}
         // Sinon renommer le fichier pour qu'il porte l'extension .txt
             { 
-//BufferedWriter etudiants=new BufferedWriter(new FileWriter("Etudiants.txt", true));
+
                 try{
 
                     //FileWriter lu=new FileWriter(monFichier);
-                    BufferedWriter fichier1=new BufferedWriter(new FileWriter("monFichier.txt", true));//new FileWriter("treillis.txt", true));
+                    BufferedWriter fichier1=new BufferedWriter(new FileWriter(monFichier, true));//new FileWriter("treillis.txt", true));
                     //fichier1.write(creationFichier()); 
                     try ( Statement st = con.createStatement()) {
                         String sql = "select * from GroupeModule";
@@ -698,13 +715,13 @@ public static Connection connectPostgresql(String host, int port,
                        
                         while (res4.next()){ 
                             int id = res4.getInt("idEtudiant");
-                            fichier1.write(id);
+                            fichier1.write(id+";");
                              // on peut accéder à une colonne par son nom
 ;
                             int choix1=res4.getInt("choix1");
                             int choix2=res4.getInt("choix2");
                             int choix3=res4.getInt("choix3");
-                            fichier1.write(";" + choix1+","+choix2+","+choix3);
+                            fichier1.write(choix1+","+choix2+","+choix3);
                             res4.next();
                             int choix21=res4.getInt("choix1");
                             int choix22=res4.getInt("choix2");
@@ -727,9 +744,12 @@ public static Connection connectPostgresql(String host, int port,
             }
         }
         
-    
-                //createPersonne(con,"Zins","Sabine","sabine.zins@insa-strasbourg.fr", "pass");
-            menuPrincipal(con);
+        menuPrincipal(con);
+                //createEtudiant(con,"Zins","Sabine","sabine.zins@insa-strasbourg.fr", "pass");
+            /*for (int i=0;i<getAllIds().size();i++){
+                System.out.println(getAllIds().get(i));
+            
+            }*/
         } catch (Exception ex) {
             throw new Error("Probleme SQL : " + ex.getMessage(), ex);
        }

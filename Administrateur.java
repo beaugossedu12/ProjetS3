@@ -10,12 +10,72 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  *
  * @author sabin
  */
 public class Administrateur {
+    
+    private final int id;
+    private String nom;
+    private String prenom;
+    private String email;
+    private String mdp;
+
+    public int getId() {
+        return id;
+    }
+    public String getNom() {
+        return nom;
+    }
+
+    public void setNom(String nom) {
+        this.nom = nom;
+    }
+
+    public String getPrenom() {
+        return prenom;
+    }
+
+    public void setPrenom(String prenom) {
+        this.prenom = prenom;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getMdp() {
+        return mdp;
+    }
+
+    public void setMdp(String mdp) {
+        this.mdp = mdp;
+    }
+
+
+  
+
+    public Administrateur(int id,String nom, String prenom, String email, String mdp) {
+        this.id=id;
+        this.nom = nom;
+        this.prenom = prenom;
+        this.email = email;
+        this.mdp = mdp;
+    }
+    public Administrateur(int id,String email, String mdp) {
+        this.id=id;
+        this.email = email;
+        this.mdp = mdp;
+    }
         public static void afficheTousAdministrateurs(Connection con)throws SQLException 
     {
         try ( Statement st = con.createStatement()) {
@@ -110,5 +170,18 @@ public class Administrateur {
             System.out.println(ex);
         }
                         
+    }
+    public static Optional<Administrateur> loginA(Connection con, String email, String pass) throws SQLException {
+        try ( PreparedStatement pst = con.prepareStatement(
+                "select id from administrateur where email = ? and mdp = ?")) {
+            pst.setString(1, email);
+            pst.setString(2, pass);
+            ResultSet res = pst.executeQuery();
+            if (res.next()) {
+                return Optional.of(new Administrateur(res.getInt("id"), email, pass));
+            } else {
+                return Optional.empty();
+            }
+        }
     }
 }
