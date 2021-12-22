@@ -1,15 +1,13 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
-package fr.insa.quarteroni.Interface;
+package fr.insa.zins.testvaadin;
 
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.textfield.TextField;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -27,7 +25,6 @@ public class ModifModuleModifNom extends FormLayout{
     private TextField nomModifie;
     private Button enregistrer;
     private final Button retour;
-
     
     public ModifModuleModifNom(VuePrincipale main){
         //try (Connection con = testConnect()) {
@@ -46,7 +43,6 @@ public class ModifModuleModifNom extends FormLayout{
              /*} catch (SQLException ex) {
             throw new Error(ex);
                 }*/
-             
             this.retour = new Button("Retour");
             this.add(this.retour);
             this.retour.addClickListener((e) -> {

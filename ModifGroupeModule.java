@@ -1,18 +1,8 @@
-package fr.insa.quarteroni.Interface;
-
-
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.function.ValueProvider;
-import fr.insa.quarteroni.Interface.ModifGroupeModuleAjout;
-import fr.insa.quarteroni.Interface.ModifGroupeModuleModif;
-import fr.insa.quarteroni.Interface.ModifGroupeModuleSupp;
-import fr.insa.quarteroni.Interface.VuePrincipale;
-
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package fr.insa.zins.testvaadin;
 
 import com.vaadin.flow.component.button.Button;
@@ -27,8 +17,7 @@ import java.sql.SQLException;
  *
  * @author sabin
  */
-public class ModifGroupeModule extends VerticalLayout {
-
+public class ModifGroupeModule extends VerticalLayout  {
     private VuePrincipale main;
     private Button ajouter;
     private Button supprimer;
@@ -36,47 +25,52 @@ public class ModifGroupeModule extends VerticalLayout {
     private Button afficher;
     private Grid tableau;
 
-    public ModifGroupeModule(VuePrincipale main) {
+    public ModifGroupeModule(VuePrincipale main) throws ClassNotFoundException{
         this.main = main;
-
-        this.tableau = new Grid();
-        ValueProvider renderer = null;
-        tableau.addColumn(renderer);
-
-        this.ajouter = new Button("Ajouter un groupe de modules");
-        this.add(this.ajouter);
-        ajouter.setWidthFull();
-
-        this.ajouter.addClickListener((e) -> {
-            this.main.changeContenu(new ModifGroupeModuleAjout(this.main));
-            this.main.avancerBarre(this.main);
-            //méthode à appliquer au clic du bouton 
-        });
-        this.supprimer = new Button("Supprimer un groupe de modules");
-        this.add(this.supprimer);
-        supprimer.setWidthFull();
-
-        this.supprimer.addClickListener((e) -> {
-            this.main.changeContenu(new ModifGroupeModuleSupp(this.main));
-            this.main.avancerBarre(this.main);
-            //méthode à appliquer au clic du bouton 
-        });
-        this.modifier = new Button("Modifier des informations");
-        this.add(this.modifier);
-        modifier.setWidthFull();
-
-        this.modifier.addClickListener((e) -> {
-            this.main.changeContenu(new ModifGroupeModuleModif(this.main));
-            this.main.avancerBarre(this.main);
-            //méthode à appliquer au clic du bouton 
-        });
-        this.afficher = new Button("Afficher les groupes modules");
-        this.add(this.afficher);
-        afficher.setWidthFull();
-
+        try ( Connection con = testConnect()) {
         
-        
+            this.tableau = new Grid();
+            ValueProvider renderer = null;
+            tableau.addColumn(renderer);
 
+
+            this.ajouter = new Button("Ajouter un groupe de modules");
+            this.add(this.ajouter);
+            ajouter.setWidthFull();
+
+            this.ajouter.addClickListener((e) -> {
+                this.main.changeContenu(new ModifGroupeModuleAjout(this.main));
+                this.main.avancerBarre(this.main); 
+                //méthode à appliquer au clic du bouton 
+            });
+            this.supprimer = new Button("Supprimer un groupe de modules");
+            this.add(this.supprimer);
+            supprimer.setWidthFull();
+
+            this.supprimer.addClickListener((e) -> {
+                this.main.changeContenu(new ModifGroupeModuleSupp(this.main));
+                this.main.avancerBarre(this.main); 
+                //méthode à appliquer au clic du bouton 
+            });
+            this.modifier = new Button("Modifier des informations");
+            this.add(this.modifier);
+            modifier.setWidthFull();
+
+            this.modifier.addClickListener((e) -> {
+                this.main.changeContenu(new ModifGroupeModuleModif(this.main));
+                this.main.avancerBarre(this.main); 
+                //méthode à appliquer au clic du bouton 
+            });
+            this.afficher = new Button("Afficher les groupes modules");
+            this.add(this.afficher);
+            afficher.setWidthFull();
+
+            this.afficher.addClickListener((e) -> {
+
+                //méthode à appliquer au clic du bouton 
+            });
+        } catch (SQLException ex) {
+            throw new Error(ex);
+        }
     }
 }
-        

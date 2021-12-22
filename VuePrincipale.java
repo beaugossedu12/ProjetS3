@@ -3,14 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.insa.quarteroni.Interface;
+package fr.insa.zins.testvaadin;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import static com.vaadin.flow.component.icon.VaadinIcon.CORNER_UPPER_LEFT;
@@ -24,16 +23,19 @@ import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import java.sql.Connection;
+import static fr.insa.zins.classe.bdd2.testConnect;
+import java.sql.SQLException;
 
 /**
  *
- * @author arthurquarteroni
+ * @author sabin
  */
 @Route(value = "")
 @PageTitle("VuePrincipale")
-public class VuePrincipale extends VerticalLayout {
-
+public class VuePrincipale extends VerticalLayout{
+    private SessionInfoEtudiant sessionInfo;
+    private SessionInfoAdmin sessionInfoA;
+    
     private HorizontalLayout entete;
     private HorizontalLayout reste;
     private VerticalLayout menugauche;
@@ -44,14 +46,18 @@ public class VuePrincipale extends VerticalLayout {
     private Button retour;
     private TextField titre;
     private Accordion electifs;
+   
 
     private Integer idUser = null;
-    private Connection dbCon;
-
-    private VerticalLayout contenuetbarre;
-    private VerticalLayout barrelayout;
-    private ProgressBar barre;
+    private final VerticalLayout contenuetbarre;
+    private final VerticalLayout barrelayout;
+    private final ProgressBar barre;
     private Icon espace;
+    
+
+
+
+  
 
     public final void changeContenu(Component c) {
         this.contenu.removeAll();
@@ -64,8 +70,8 @@ public class VuePrincipale extends VerticalLayout {
             value = barre.getMin();
         }
         barre.setValue(value);
+
     }
-   
     public final void reculerBarre(Component d) {
         double value = barre.getValue() + -15;
         if (value > barre.getMax()) {
@@ -79,10 +85,9 @@ public class VuePrincipale extends VerticalLayout {
         barre.setValue(value);
 
     }
-
-    public VuePrincipale() {
-
-        //this.dbCon = bdd2.connectBDD();
+    public VuePrincipale(){
+        this.sessionInfo = new SessionInfoEtudiant();
+        this.sessionInfoA = new SessionInfoAdmin();
         // ENTETE
         this.entete = new HorizontalLayout();
         this.entete.setWidthFull();
@@ -103,10 +108,10 @@ public class VuePrincipale extends VerticalLayout {
         this.titre.setReadOnly(true);
         this.titre.setSizeFull();
         this.titre.addThemeVariants(TextFieldVariant.LUMO_ALIGN_CENTER);
-     
-
+        
         this.entete.add(this.titre);
-
+       
+        
         this.triangledroite = new Icon(CORNER_UPPER_RIGHT);
         this.entete.add(this.triangledroite);
         triangledroite.setSize("50px");
@@ -192,7 +197,6 @@ public class VuePrincipale extends VerticalLayout {
             this.changeContenu(new Accueil(this));
             this.resetBarre(this);
         });
-
         //Layout pour organiser les 2 suivants
         this.contenuetbarre = new VerticalLayout();
         this.contenuetbarre.setWidthFull();
@@ -225,6 +229,31 @@ public class VuePrincipale extends VerticalLayout {
         this.barrelayout.add(this.barre);
 
         this.changeContenu(new Accueil(this));
+        try{
+            this.sessionInfo.setConBdD(testConnect());
+            this.sessionInfoA.setConBdDA(testConnect());
+        } catch (ClassNotFoundException | SQLException ex) {
+            this.changeContenu(new BdDNonAccessible(this));
+        }
+    }
 
+    /**
+     * @return the idUser
+     */
+    public Integer getIdUser() {
+        return idUser;
+    }
+
+    /**
+     * @param idUser the idUser to set
+     */
+    public void setIdUser(Integer idUser) {
+        this.idUser = idUser;
+    }
+    public SessionInfoEtudiant getSessionInfo() {
+        return sessionInfo;
+    }
+    public SessionInfoAdmin getSessionInfoA() {
+        return sessionInfoA;
     }
 }
