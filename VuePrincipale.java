@@ -42,7 +42,7 @@ public class VuePrincipale extends VerticalLayout {
     private Icon triangledroite;
     private Icon pointille;
     private Button retour;
-    private H3 titre;
+    private TextField titre;
     private Accordion electifs;
 
     private Integer idUser = null;
@@ -98,13 +98,11 @@ public class VuePrincipale extends VerticalLayout {
         trianglegauche.setSize("50px");
         trianglegauche.setColor("blue");
 
-        //this.titre = new TextField();
-        //this.titre.setValue("LOGICIEL DE CHOIX DES ELECTIFS");
-        //this.titre.setReadOnly(true);
-        //this.titre.setSizeFull();
-       this.titre= new H3("LOGICIEL DE CHOIX DES ELECTIFS");
-       this.titre.setSizeFull();
-       //this.titre.addThemeVariants(TextFieldVariant.LUMO_ALIGN_CENTER);
+        this.titre = new TextField();
+        this.titre.setValue("LOGICIEL DE CHOIX DES ELECTIFS");
+        this.titre.setReadOnly(true);
+        this.titre.setSizeFull();
+        this.titre.addThemeVariants(TextFieldVariant.LUMO_ALIGN_CENTER);
      
 
         this.entete.add(this.titre);
