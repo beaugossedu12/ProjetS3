@@ -20,6 +20,7 @@ public class ModifGroupeModuleSupp extends FormLayout {
     private TextField nom;
 
     private Button enregistrer;
+    private Button retour;
 
     
     public ModifGroupeModuleSupp(VuePrincipale main) {
@@ -35,5 +36,17 @@ public class ModifGroupeModuleSupp extends FormLayout {
         
         enregistrer.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         add(nom,enregistrer);
+              
+              
+        this.retour = new Button("Retour");
+        this.add(this.retour);
+        this.retour.addClickListener((e) -> {
+            try {
+                this.main.changeContenu(new ModifEtudiant(this.main));
+            } catch (SQLException ex) {
+                Logger.getLogger(ModifEtudiantAjout.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            this.main.reculerBarre(main);
+        });
     }  
 }
