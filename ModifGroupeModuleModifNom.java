@@ -40,7 +40,7 @@ public class ModifGroupeModuleModifNom extends FormLayout{
              /*} catch (SQLException ex) {
             throw new Error(ex);
                 }*/
-        }  
+        
       
       this.retour = new Button("Retour");
         this.add(this.retour);
@@ -52,4 +52,5 @@ public class ModifGroupeModuleModifNom extends FormLayout{
             }
             this.main.reculerBarre(main);
         });
+           } 
 }
