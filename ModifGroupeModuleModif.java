@@ -17,6 +17,7 @@ public class ModifGroupeModuleModif extends VerticalLayout{
     private Button intitule;
     private Button description;
     private VuePrincipale main;
+    private Button retour;
     
      public ModifGroupeModuleModif (VuePrincipale main) {
    
@@ -40,6 +41,17 @@ public class ModifGroupeModuleModif extends VerticalLayout{
             this.main.changeContenu(new ModifGroupeModuleModifDescription(this.main));
             this.main.avancerBarre(this.main); 
             });
+         
+         this.retour = new Button("Retour");
+        this.add(this.retour);
+        this.retour.addClickListener((e) -> {
+            try {
+                this.main.changeContenu(new ModifEtudiant(this.main));
+            } catch (SQLException ex) {
+                Logger.getLogger(ModifEtudiantAjout.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            this.main.reculerBarre(main);
+        });
                 
     }   
 }
