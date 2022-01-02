@@ -18,7 +18,7 @@ public class ModifGroupeModuleAjout extends FormLayout{
     
     private TextField nom;
     private TextField description;
-
+    private Button retour;
  
    private Button enregistrer;
 
@@ -39,5 +39,16 @@ public class ModifGroupeModuleAjout extends FormLayout{
 
         enregistrer.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         add(nom,description,enregistrer);
+       
+       this.retour = new Button("Retour");
+        this.add(this.retour);
+        this.retour.addClickListener((e) -> {
+            try {
+                this.main.changeContenu(new ModifEtudiant(this.main));
+            } catch (SQLException ex) {
+                Logger.getLogger(ModifEtudiantAjout.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            this.main.reculerBarre(main);
+        });
     }  
 }
