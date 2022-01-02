@@ -20,6 +20,7 @@ public class ModifGroupeModuleModifNom extends FormLayout{
     private TextField nom;
     private TextField nomModifie;
     private Button enregistrer;
+    private Button retour;
 
     
     public ModifGroupeModuleModifNom(VuePrincipale main){
@@ -40,4 +41,15 @@ public class ModifGroupeModuleModifNom extends FormLayout{
             throw new Error(ex);
                 }*/
         }  
+      
+      this.retour = new Button("Retour");
+        this.add(this.retour);
+        this.retour.addClickListener((e) -> {
+            try {
+                this.main.changeContenu(new ModifEtudiant(this.main));
+            } catch (SQLException ex) {
+                Logger.getLogger(ModifEtudiantAjout.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            this.main.reculerBarre(main);
+        });
 }
