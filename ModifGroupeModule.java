@@ -24,6 +24,7 @@ public class ModifGroupeModule extends VerticalLayout  {
     private Button modifier;
     private Button afficher;
     private Grid tableau;
+    private Button retour;
 
     public ModifGroupeModule(VuePrincipale main) throws ClassNotFoundException{
         this.main = main;
@@ -72,5 +73,16 @@ public class ModifGroupeModule extends VerticalLayout  {
         } catch (SQLException ex) {
             throw new Error(ex);
         }
+        
+        this.retour = new Button("Retour");
+        this.add(this.retour);
+        this.retour.addClickListener((e) -> {
+            try {
+                this.main.changeContenu(new ModifEtudiant(this.main));
+            } catch (SQLException ex) {
+                Logger.getLogger(ModifEtudiantAjout.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            this.main.reculerBarre(main);
+        });
     }
 }
