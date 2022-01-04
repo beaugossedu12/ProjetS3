@@ -6,6 +6,7 @@
 package fr.insa.quarteroni.Interface;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
@@ -23,6 +24,7 @@ public class Etudiant1 extends VerticalLayout {
     private Button valider;
     private String login;
     private LoginForm LoginForm;
+    private Button modifmdp;
     
     public Etudiant1(VuePrincipale main) {
    
@@ -45,6 +47,12 @@ public class Etudiant1 extends VerticalLayout {
      this.valider = new Button("Valider");
         this.add(this.valider);
      valider.setWidthFull();
+     valider.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+     
+     this.modifmdp = new Button("Modifier le mot de passe");
+     this.add(this.modifmdp);
+     modifmdp.setWidthFull();
+
 
 this.valider.addClickListener((e) -> {
    

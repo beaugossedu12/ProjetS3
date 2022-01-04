@@ -18,7 +18,7 @@ import com.vaadin.flow.component.textfield.TextFieldVariant;
  *
  * @author arthurquarteroni
  */
-public class Etudiant4Choix2 extends VerticalLayout {
+public class Etudiant5Choix3 extends VerticalLayout {
 
     private VuePrincipale main;
     private H3 titre;
@@ -40,11 +40,11 @@ public class Etudiant4Choix2 extends VerticalLayout {
     private final Button module33;
     private final Button retour;
 
-    public Etudiant4Choix2(VuePrincipale main) {
+    public Etudiant5Choix3(VuePrincipale main) {
 
         this.main = main;
 
-        this.titre = new H3("GROUPE DE MODULES 2");
+        this.titre = new H3("GROUPE DE MODULES 3");
         titre.setSizeFull();
         this.add(this.titre);
 
@@ -137,13 +137,14 @@ public class Etudiant4Choix2 extends VerticalLayout {
         this.retour = new Button("Retour");
         this.add(this.retour);
         this.retour.addClickListener((e) -> {
-            this.main.changeContenu(new Etudiant3Choix1(this.main));
+            this.main.changeContenu(new Etudiant4Choix2(this.main));
             this.main.reculerBarre(main);
         });
 
         this.valider.addClickListener((e) -> {
 
-            this.main.changeContenu(new Etudiant5Choix3(this.main));
+            this.main.changeContenu(new EtudiantFin(this.main));
+            this.main.avancerBarre(this.main);
             this.main.avancerBarre(this.main);
 
         });

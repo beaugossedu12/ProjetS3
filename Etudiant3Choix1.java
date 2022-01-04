@@ -6,6 +6,7 @@
 package fr.insa.quarteroni.Interface;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -130,6 +131,7 @@ public class Etudiant3Choix1 extends VerticalLayout {
         this.valider = new Button("Valider");
         this.add(this.valider);
         valider.setWidthFull();
+        valider.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         this.retour = new Button("Retour");
         this.add(this.retour);
