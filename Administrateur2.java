@@ -1,14 +1,14 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
  */
-package fr.insa.zins.testvaadin;
+package fr.insa.quarteroni.Interface;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import static fr.insa.zins.classe.bdd2.testConnect;
+import static fr.insa.quarteroni.BDD.bdd2.testConnect;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -22,9 +22,10 @@ public class Administrateur2 extends VerticalLayout {
     private Button etudiant;
     private Button module;
     private Button groupeModule;
+    private final Button fichiertexte;
 
 
-    public Administrateur2(VuePrincipale main) throws ClassNotFoundException{
+    public Administrateur2(VuePrincipale main) {
         this.main = main;
         
             this.etudiant = new Button("Etudiant");
@@ -35,7 +36,7 @@ public class Administrateur2 extends VerticalLayout {
                 try ( Connection con = testConnect()) {
                     this.main.changeContenu(new ModifEtudiant(this.main));
                 this.main.avancerBarre(this.main);  
-                } catch (ClassNotFoundException|SQLException ex) {
+                } catch (SQLException ex) {
                     throw new Error(ex);
                 }
             });
@@ -47,7 +48,7 @@ public class Administrateur2 extends VerticalLayout {
                 try ( Connection con1 = testConnect()) {
                     this.main.changeContenu(new ModifModule(this.main));
                     this.main.avancerBarre(this.main);
-                } catch (ClassNotFoundException|SQLException ex) {
+                } catch (SQLException ex) {
                     throw new Error(ex);
                 }
             });
@@ -56,16 +57,20 @@ public class Administrateur2 extends VerticalLayout {
             groupeModule.setWidthFull();
 
             this.groupeModule.addClickListener((e) -> {
-                try{
-                this.main.changeContenu(new ModifGroupeModule(this.main));
-                this.main.avancerBarre(this.main);
-                }catch(ClassNotFoundException ex){
-                    throw new Error(ex);
-                }
-            });
 
+                this.main.changeContenu(newModifGroupeModule(this.main));
+                this.main.avancerBarre(this.main);
+            });
+            
+            this.fichiertexte = new Button("Afficher le fichier texte");
+            this.add(this.fichiertexte);
+            fichiertexte.setWidthFull();
+            fichiertexte.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
+            
     }
+
     private Component newModifGroupeModule(VuePrincipale main) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
+
 }
