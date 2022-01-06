@@ -10,6 +10,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.function.ValueProvider;
 import static fr.insa.zins.classe.Etudiant.afficheTousEtudiants;
+
 import static fr.insa.zins.classe.bdd2.testConnect;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -26,14 +27,12 @@ public class ModifEtudiant extends VerticalLayout {
     private Button afficher;
     private Grid tableau;
     private Button retour;
-     
+    //private EtudiantDonneesTest etudiantDonneesTest;
     public ModifEtudiant(VuePrincipale main)throws SQLException, ClassNotFoundException {
         this.main = main;
- 
+        //this.etudiantDonneesTest=etudiantDonneesTest;
         
-            this.tableau = new Grid();
-            ValueProvider renderer = null;
-            tableau.addColumn(renderer);
+
 
 
             this.ajouter = new Button("Ajouter un étudiant");
@@ -45,7 +44,7 @@ public class ModifEtudiant extends VerticalLayout {
                 this.main.changeContenu(new ModifEtudiantAjout(this.main));
                 this.main.avancerBarre(this.main); 
                 //méthode à appliquer au clic du bouton 
-                }catch(ClassNotFoundException ex){
+                }catch(Exception ex){
                     throw new Error(ex);
                 }
             });
@@ -72,10 +71,10 @@ public class ModifEtudiant extends VerticalLayout {
             afficher.setWidthFull();
 
             this.afficher.addClickListener((e) -> {
-                try (Connection con = testConnect()) {
-                 afficheTousEtudiants(con);
-                //méthode à appliquer au clic du bouton 
-                 } catch (ClassNotFoundException| SQLException ex) {
+                try {
+                this.main.changeContenu(new test(this.main));
+                this.main.avancerBarre(this.main); 
+                }catch(Exception ex){
                     throw new Error(ex);
                 }
             });

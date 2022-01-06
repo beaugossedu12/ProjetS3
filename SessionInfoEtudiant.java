@@ -42,14 +42,14 @@ public class SessionInfoEtudiant {
     /**
      * @return the conBdD
      */
-    public Connection getConBdD() {
+    public Connection getConBdDE() {
         return conBdD;
     }
 
     /**
      * @param conBdD the conBdD to set
      */
-    public void setConBdD(Connection conBdD) {
+    public void setConBdDE(Connection conBdD) {
         this.conBdD = conBdD;
     }
 

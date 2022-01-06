@@ -8,7 +8,10 @@ package fr.insa.zins.testvaadin;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.TextField;
+import fr.insa.zins.classe.GroupeModule;
+import fr.insa.zins.classe.Module;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,6 +29,7 @@ public class ModifModuleModifDescription extends FormLayout{
     private Button enregistrer;
     private final Button retour;
     
+    //private EtudiantDonneesTest etudiantDonneesTest;
     public ModifModuleModifDescription(VuePrincipale main){
         //try (Connection con = testConnect()) {
             this.main = main;
@@ -37,6 +41,15 @@ public class ModifModuleModifDescription extends FormLayout{
 
 
             enregistrer.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            this.enregistrer.addClickListener(event -> { 
+                 try{
+                 Module.ModifDescriptionModule(this.main.getConBdD(), this.nom.getValue(), this.nomModifie.getValue());
+                 Notification.show("Nouvelle description enregistrée");
+                } catch (SQLException ex) {
+                Notification.show("Problème BdD : " + ex.getLocalizedMessage());
+                 Logger.getLogger(ModifModuleModifDescription.class.getName()).log(Level.SEVERE, null, ex);
+            } 
+             });
             add(nom,nomModifie,enregistrer);
             //Etudiant.ModifEmailEtudiant(con, nom, emailModifie);
            // email.addValueChangeListener(event -> Etudiant.ModifEmailEtudiant(con, nom.getValue(), email.getValue()) );

@@ -1,12 +1,16 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
-package fr.insa.quarteroni.Interface;
+package fr.insa.zins.testvaadin;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -41,17 +45,16 @@ public class ModifGroupeModuleModif extends VerticalLayout{
             this.main.changeContenu(new ModifGroupeModuleModifDescription(this.main));
             this.main.avancerBarre(this.main); 
             });
-         
-         this.retour = new Button("Retour");
+        
+        this.retour = new Button("Retour");
         this.add(this.retour);
         this.retour.addClickListener((e) -> {
             try {
                 this.main.changeContenu(new ModifEtudiant(this.main));
-            } catch (SQLException ex) {
+            } catch (ClassNotFoundException|SQLException ex) {
                 Logger.getLogger(ModifEtudiantAjout.class.getName()).log(Level.SEVERE, null, ex);
             }
             this.main.reculerBarre(main);
-        });
-                
+        });       
     }   
 }

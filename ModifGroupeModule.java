@@ -12,6 +12,8 @@ import com.vaadin.flow.function.ValueProvider;
 import static fr.insa.zins.classe.bdd2.testConnect;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -25,7 +27,7 @@ public class ModifGroupeModule extends VerticalLayout  {
     private Button afficher;
     private Grid tableau;
     private Button retour;
-
+    
     public ModifGroupeModule(VuePrincipale main) throws ClassNotFoundException{
         this.main = main;
         try ( Connection con = testConnect()) {
@@ -67,8 +69,12 @@ public class ModifGroupeModule extends VerticalLayout  {
             afficher.setWidthFull();
 
             this.afficher.addClickListener((e) -> {
-
-                //méthode à appliquer au clic du bouton 
+                try {
+                this.main.changeContenu(new test3(this.main));
+                this.main.avancerBarre(this.main); 
+                }catch(Exception ex){
+                    throw new Error(ex);
+                }
             });
         } catch (SQLException ex) {
             throw new Error(ex);
@@ -79,7 +85,7 @@ public class ModifGroupeModule extends VerticalLayout  {
         this.retour.addClickListener((e) -> {
             try {
                 this.main.changeContenu(new ModifEtudiant(this.main));
-            } catch (SQLException ex) {
+            } catch (ClassNotFoundException|SQLException ex) {
                 Logger.getLogger(ModifEtudiantAjout.class.getName()).log(Level.SEVERE, null, ex);
             }
             this.main.reculerBarre(main);

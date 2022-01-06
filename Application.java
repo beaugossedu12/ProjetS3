@@ -1,6 +1,9 @@
 package fr.insa.zins.testvaadin;
 
 import com.vaadin.flow.component.dependency.NpmPackage;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 
 import org.springframework.boot.SpringApplication;
@@ -23,5 +26,7 @@ public class Application extends SpringBootServletInitializer {
         LaunchUtil.launchBrowserInDevelopmentMode(SpringApplication.run(Application.class, args));
         //test();
     }
+    
+
 
 }

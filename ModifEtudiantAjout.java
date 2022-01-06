@@ -13,9 +13,13 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.TextField;
-import static fr.insa.zins.classe.bdd2.createEtudiant;
-import java.sql.Connection;
+import fr.insa.zins.classe.Etudiant;
+import fr.insa.zins.classe.EtudiantDonnees;
+
+import fr.insa.zins.classe.bdd2;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,11 +37,13 @@ public class ModifEtudiantAjout extends FormLayout {
     private Button enregistrer;
     //Binder<Etudiant> binder = new BeanValidationBinder<>(Etudiant.class);
     private Button retour;
-    
-    public ModifEtudiantAjout(VuePrincipale main) throws ClassNotFoundException {
+    //private List <Etudiant> etudiantListe;
+    //private Connection conBdD;
+    //private EtudiantDonneesTest etudiantDonneesTest;
+    public ModifEtudiantAjout(VuePrincipale main) {
         //binder.bindInstanceFields(this);
         this.main = main;
-        
+
         this.vtnom = new TextField("Nom");
         this.vtprenom = new TextField("Prénom");
         this.vtemail = new TextField("Adresse Email");
@@ -55,31 +61,35 @@ public class ModifEtudiantAjout extends FormLayout {
         vtmdp.setClearButtonVisible(true);
 
         
-        enregistrer.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        this.enregistrer.addClickListener((e) -> { 
-            Connection con= this.main.getSessionInfo().getConBdD();
-            
-            String nom = this.vtnom.getValue();
-            String prenom= this.vtprenom.getValue();
-            String email = this.vtemail.getValue();
-            String mdp = this.vtmdp.getValue();
+        enregistrer.addThemeVariants(ButtonVariant.LUMO_PRIMARY);  
+       
+        this.enregistrer.addClickListener(event -> { 
+            //Connection con = this.main.getSessionInfo().getConBdDE();
+             //Connection con= this.main.testConnect();
+            //String nom = this.vtnom.getValue();
+            //String prenom= this.vtprenom.getValue();
+            //String email = this.vtemail.getValue();
+           // String mdp = this.vtmdp.getValue();
          
-
-            try  {
-                //Connection con = bdd2.testConnect();
-                createEtudiant(con, nom, prenom, email, mdp);
-                //Etudiant newEtudiant = new Etudiant (id, nom, prenom, email, mdp);
-                Notification.show("Etudiant " + nom + " créé");
+            try{
+         
+                int id = bdd2.createEtudiant(this.main.getConBdD(), this.vtnom.getValue(),this.vtprenom.getValue(), this.vtemail.getValue(), this.vtmdp.getValue());
+                //createEtudiant(this.main.getConBdD(), this.vtnom.getValue(), this.vtprenom.getValue(), this.vtemail.getValue(), this.vtmdp.getValue());
+                Etudiant newEtudiant = new Etudiant (id, this.vtnom.getValue(), this.vtprenom.getValue(), this.vtemail.getValue(), this.vtmdp.getValue());
+                //this.main.getSessionInfo().setCurUser(Optional.of(newEtudiant));
+                Etudiant.getListeEtudiant().add(newEtudiant);
+                Notification.show("Etudiant " + this.vtnom.getValue() + " créé");
                 //méthode à appliquer au clic du bouton 
          
-            } catch (Exception ex) {
-            throw new Error("Probleme SQL : " + ex.getMessage(), ex);
+            } catch (SQLException ex) {
+                Notification.show("Problème BdD : " + ex.getLocalizedMessage());
+                 Logger.getLogger(ModifEtudiantAjout.class.getName()).log(Level.SEVERE, null, ex);
             }     
         });
-        add(this.vtnom,this.vtprenom,this.vtemail,this.vtmdp,this.enregistrer);
+         this.add(this.vtnom,this.vtprenom,this.vtemail,this.vtmdp,this.enregistrer);
 
         this.retour = new Button("Retour");
-        this.add(this.retour);
+        
         this.retour.addClickListener((e) -> {
             try {
                 this.main.changeContenu(new ModifEtudiant(this.main));
@@ -88,6 +98,7 @@ public class ModifEtudiantAjout extends FormLayout {
             }
             this.main.reculerBarre(main);
         });
+        this.add(this.retour);
     }  
 }
 

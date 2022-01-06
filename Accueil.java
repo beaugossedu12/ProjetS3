@@ -11,7 +11,7 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.progressbar.ProgressBar;
 import fr.insa.zins.classe.bdd2;
-import static fr.insa.zins.classe.bdd2.testConnect;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -20,7 +20,7 @@ import java.sql.SQLException;
  * @author sabin
  */
 public class Accueil extends VerticalLayout {
-    private Connection conBdD;
+   private Connection conBdD;
     private VuePrincipale main;
 
     private Label accueil;
@@ -29,6 +29,7 @@ public class Accueil extends VerticalLayout {
     private ProgressBar barre;
     private Icon espace;
 
+    //private EtudiantDonneesTest etudiantDonneesTest;
     public Connection getConBdD() {
         return conBdD;
     }
@@ -40,8 +41,11 @@ public class Accueil extends VerticalLayout {
     public Accueil(VuePrincipale main) {
 
         this.main = main;
-
- 
+       /* try{
+        bdd2.recreeTout(this.main.testConnect());
+        }catch(ClassNotFoundException|SQLException ex){
+            throw new Error(ex);
+        }*/
         this.etudiant = new Button("Vous êtes un ETUDIANT");
         etudiant.setWidthFull();
         this.add(this.etudiant);

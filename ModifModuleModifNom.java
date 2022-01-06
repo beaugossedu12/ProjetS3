@@ -8,7 +8,9 @@ package fr.insa.zins.testvaadin;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.TextField;
+
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,10 +28,11 @@ public class ModifModuleModifNom extends FormLayout{
     private Button enregistrer;
     private final Button retour;
     
+   // private EtudiantDonneesTest etudiantDonneesTest;
     public ModifModuleModifNom(VuePrincipale main){
         //try (Connection con = testConnect()) {
             this.main = main;
-
+           //this.etudiantDonneesTest=etudiantDonneesTest;
             this.nom = new TextField("Intitulé");
             this.nomModifie = new TextField("Nouvel intitulé");
 
@@ -37,6 +40,15 @@ public class ModifModuleModifNom extends FormLayout{
 
 
             enregistrer.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            this.enregistrer.addClickListener(event -> { 
+                 try{
+                 fr.insa.zins.classe.Module.ModifNomModule(this.main.getConBdD(), this.nom.getValue(), this.nomModifie.getValue());
+                 Notification.show("Nouveau nom enregistré");
+                } catch (SQLException ex) {
+                Notification.show("Problème BdD : " + ex.getLocalizedMessage());
+                 Logger.getLogger(ModifModuleModifNom.class.getName()).log(Level.SEVERE, null, ex);
+            } 
+             });
             add(nom,nomModifie,enregistrer);
             //Etudiant.ModifEmailEtudiant(con, nom, emailModifie);
            // email.addValueChangeListener(event -> Etudiant.ModifEmailEtudiant(con, nom.getValue(), email.getValue()) );

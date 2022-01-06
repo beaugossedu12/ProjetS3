@@ -10,6 +10,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.function.ValueProvider;
+//import fr.insa.zins.classe.EtudiantDonneesTest;
 import fr.insa.zins.classe.bdd2;
 import static fr.insa.zins.classe.bdd2.testConnect;
 import java.sql.Connection;
@@ -29,14 +30,12 @@ public class ModifModule extends VerticalLayout{
     private TextArea textArea;
     private String Module;
     private final Button retour;
-    
+     // private final EtudiantDonneesTest etudiantDonneesTest;
     public ModifModule(VuePrincipale main) throws SQLException{
         this.main = main;
+        //this.etudiantDonneesTest=etudiantDonneesTest;
         
-        
-            this.tableau = new Grid();
-            ValueProvider renderer = null;
-            tableau.addColumn(renderer);
+
 
 
             this.ajouter = new Button("Ajouter un module");
@@ -74,20 +73,11 @@ public class ModifModule extends VerticalLayout{
             afficher.setWidthFull();
 
             this.afficher.addClickListener((e) -> {
-                /*Grid<Module> grid = new Grid<>(Module.class, false);
-                grid.addColumn(Module::getId).setHeader("Identificateur");
-                grid.addColumn(Module::getIdGM).setHeader("Groupe de modules associé");
-                grid.addColumn(Module::getNom).setHeader("Intitulé");
-                grid.addColumn(Module::getDescription).setHeader("Description");
-
-                List<Module> people = DataService.getPeople();
-                grid.setItems(people);
-
-                add(grid)*/; 
+ 
                 try {
-                this.main.changeContenu(new test(this.main));
+                this.main.changeContenu(new test2(this.main));
                 this.main.avancerBarre(this.main); 
-                }catch(ClassNotFoundException ex){
+                }catch(Exception ex){
                     throw new Error(ex);
                 }
                 //méthode à appliquer au clic du bouton 

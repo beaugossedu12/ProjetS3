@@ -3,51 +3,112 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package fr.insa.quarteroni.Interface;
+package fr.insa.zins.testvaadin;
 
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.textfield.TextFieldVariant;
-
+import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
+import fr.insa.zins.classe.Etudiant;
+import fr.insa.zins.classe.Voeux;
+import static fr.insa.zins.classe.Voeux.trouveVoeux;
+import fr.insa.zins.classe.bdd2;
+import java.sql.SQLException;
+import java.util.Optional;
 /**
  *
- * @author arthurquarteroni
+ * @author sabin
  */
 public class Etudiant3Choix1 extends VerticalLayout {
 
+  
     private VuePrincipale main;
     private H3 titre;
-    private HorizontalLayout choix1;
-    private TextField titrechoix1;
-    private Button module1;
-    private Button module2;
-    private Button module3;
+  //  private HorizontalLayout choix1;
+   // private TextField titrechoix1;
+    //private Button module1;
+    //private Button module2;
+    //private Button module3;
+    private IntegerField m1;
+    private IntegerField m2;
+    private IntegerField m3;
+    
+    private Optional<Etudiant> connectEtudiant;
     private Button valider;
-    private final TextField titrechoix2;
-    private final HorizontalLayout choix2;
-    private final Button module12;
+    //private final TextField titrechoix2;
+   // private final HorizontalLayout choix2;
+    /*private final Button module12;
     private final Button module22;
-    private final Button module32;
-    private final TextField titrechoix3;
-    private final HorizontalLayout choix3;
-    private final Button module13;
+    private final Button module32;*/
+  //  private final TextField titrechoix3;
+   // private final HorizontalLayout choix3;
+    /*private final Button module13;
     private final Button module23;
-    private final Button module33;
+    private final Button module33;*/
     private final Button retour;
-
+    private Voeux newVoeux;
+    
     public Etudiant3Choix1(VuePrincipale main) {
 
         this.main = main;
-
+        int a=0;
+        try{
+        int id = bdd2.createVoeux(this.main.getConBdD(), 1,this.main.getSessionInfo().getUserID(), a, a, a);
+        this.newVoeux = new Voeux(id,1,this.main.getSessionInfo().getUserID(),a,a,a);
+        }catch(SQLException e){
+            
+        }
         this.titre = new H3("GROUPE DE MODULES 1");
         titre.setSizeFull();
         this.add(this.titre);
+        
+        this.m1 = new IntegerField("Choix 1");
+        this.m1.setMin(1);
+        this.m1.setMax(3);
+        this.m2 = new IntegerField("Choix 2");
+        this.m2.setMin(1);
+        this.m2.setMax(3);        
+        this.m3= new IntegerField("Choix 3");
+        this.m3.setMin(1);
+        this.m3.setMax(3);
+        this.add(this.m1,this.m2,this.m3);
+        
+         this.valider = new Button("Valider");
+        this.valider.addClickListener((e) -> {
+            if (this.m1.getValue()==this.m2.getValue()||this.m1.getValue()==this.m3.getValue()||this.m2.getValue()==this.m3.getValue()){
+                Notification.show("Erreur : vous avez selectionné deux fois le même module");
+            }else{
+               this.main.changeContenu(new Etudiant4Choix2(this.main)); 
+                this.main.avancerBarre(this.main);
+                
+                try{
+                
+                Voeux.ModifChoix1(this.main.getConBdD(), this.main.getSessionInfo().getUserID(), this.m1.getValue());
+                Voeux.ModifChoix2(this.main.getConBdD(), this.main.getSessionInfo().getUserID(), this.m2.getValue());
+                Voeux.ModifChoix3(this.main.getConBdD(), this.main.getSessionInfo().getUserID(), this.m3.getValue());
+                /*int i=1;
+                while (i!= trouveVoeux(this.main.getConBdD(),this.main.getSessionInfo().getUserID())){
+                    i++;
+                }*/
+                Voeux.getListeVoeux().set(trouveVoeux(this.main.getConBdD(),this.main.getSessionInfo().getUserID()),newVoeux);
+                }catch(SQLException ex){
+                    
+                }
+                    
+            }
+            this.main.reculerBarre(main);
+        });
+        this.add(this.valider);
+        valider.setWidthFull();
 
-        this.titrechoix1 = new TextField();
+        this.retour = new Button("Retour");
+        this.add(this.retour);
+        this.retour.addClickListener((e) -> {
+            this.main.changeContenu(new EtudiantLogin(this.main));
+            this.main.reculerBarre(main);
+        });
+        /*this.titrechoix1 = new TextField();
         this.titrechoix1.setValue("Choix 1");
         this.titrechoix1.setReadOnly(true);
         this.titrechoix1.setSizeFull();
@@ -59,9 +120,9 @@ public class Etudiant3Choix1 extends VerticalLayout {
         this.choix1.setHeight("25%");
         this.choix1.setJustifyContentMode(JustifyContentMode.CENTER);
         this.add(this.choix1);
-        this.choix1.setMargin(true);
+        this.choix1.setMargin(true);*/
 
-        this.module1 = new Button("Module 1");
+        /*this.module1 = new Button("Module 1");
         this.choix1.add(this.module1);
         module1.setWidth("30%");
         module1.setDisableOnClick(true);
@@ -72,9 +133,9 @@ public class Etudiant3Choix1 extends VerticalLayout {
         this.module3 = new Button("Module 3");
         this.choix1.add(this.module3);
         module3.setWidth("30%");
-        module3.setDisableOnClick(true);
+        module3.setDisableOnClick(true);*/
 
-        this.titrechoix2 = new TextField();
+        /*this.titrechoix2 = new TextField();
         this.titrechoix2.setValue("Choix 2");
         this.titrechoix2.setReadOnly(true);
         this.titrechoix2.setSizeFull();
@@ -86,12 +147,12 @@ public class Etudiant3Choix1 extends VerticalLayout {
         this.choix2.setHeight("25%");
         this.choix2.setJustifyContentMode(JustifyContentMode.CENTER);
         this.add(this.choix2);
-        this.choix2.setMargin(true);
+        this.choix2.setMargin(true);*/
 
-        this.module12 = new Button("Module 1");
+       /* this.module12 = new Button("Module 1");
         this.choix2.add(this.module12);
         module12.setWidth("30%");
-        module12.setDisableOnClick(true);
+        module12.setDisableOnClick(false);
         this.module22 = new Button("Module 2");
         this.choix2.add(this.module22);
         module22.setDisableOnClick(true);
@@ -99,9 +160,9 @@ public class Etudiant3Choix1 extends VerticalLayout {
         this.module32 = new Button("Module 3");
         this.choix2.add(this.module32);
         module32.setWidth("30%");
-        module32.setDisableOnClick(true);
+        module32.setDisableOnClick(true);*/
 
-        this.titrechoix3 = new TextField();
+       /* this.titrechoix3 = new TextField();
         this.titrechoix3.setValue("Choix 3");
         this.titrechoix3.setReadOnly(true);
         this.titrechoix3.setSizeFull();
@@ -113,9 +174,9 @@ public class Etudiant3Choix1 extends VerticalLayout {
         this.choix3.setHeight("25%");
         this.choix3.setJustifyContentMode(JustifyContentMode.CENTER);
         this.add(this.choix3);
-        this.choix3.setMargin(true);
+        this.choix3.setMargin(true);*/
 
-        this.module13 = new Button("Module 1");
+        /*this.module13 = new Button("Module 1");
         this.choix3.add(this.module13);
         module13.setWidth("30%");
         module13.setDisableOnClick(true);
@@ -126,26 +187,11 @@ public class Etudiant3Choix1 extends VerticalLayout {
         this.module33 = new Button("Module 3");
         this.choix3.add(this.module33);
         module33.setWidth("30%");
-        module33.setDisableOnClick(true);
+        module33.setDisableOnClick(true);*/
 
-        this.valider = new Button("Valider");
-        this.add(this.valider);
-        valider.setWidthFull();
-        valider.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        this.retour = new Button("Retour");
-        this.add(this.retour);
-        this.retour.addClickListener((e) -> {
-            this.main.changeContenu(new Etudiant1(this.main));
-            this.main.reculerBarre(main);
-        });
 
-        this.valider.addClickListener((e) -> {
 
-            this.main.changeContenu(new Etudiant4Choix2(this.main));
-            this.main.avancerBarre(this.main);
-
-        });
     }
 
 }

@@ -7,34 +7,50 @@ package fr.insa.zins.testvaadin;
 
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import fr.insa.zins.classe.Etudiant;
-
 import static fr.insa.zins.classe.EtudiantDonnees.ensureTestData;
 import static fr.insa.zins.classe.bdd2.testConnect;
 import java.sql.Connection;
 import java.sql.SQLException;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
 
 /**
  *
  * @author sabin
  */
+
+
 public class test extends VerticalLayout {
-      private TextArea textArea;
+     private TextArea textArea;
       private VuePrincipale main;
       private String nom;
-      Grid<Etudiant> grid = new Grid<>();
+     private Grid<Etudiant> grid = new Grid<>();
      private final EtudiantForm form;
-      
-       public test(VuePrincipale main) throws ClassNotFoundException{
+    /*private TextField nom = new TextField("Nom");
+    private TextField prenom = new TextField("Prénom");
+        private TextField email = new TextField("Email");
+    private TextField mdp = new TextField("mot de passe");
+    private final EtudiantDonneesTest etudiantDonneesTest;*/
+    
+   // private Binder<Etudiant> binder = new Binder<>(Etudiant.class);
+    //private Etudiant etudiant;
+     // private Button create = new Button("New", VaadinIcon.PLUS.create());
+    // private Button save = new Button("Save", VaadinIcon.CHECK.create()); 
+   TextField filterText = new TextField();
+   // private VerticalLayout form = new VerticalLayout(nom, prenom, save);
+      public test(VuePrincipale main) throws ClassNotFoundException{
+   
        this.main = main;
        
+      // this.etudiantDonneesTest = etudiantDonneesTest;
                    try  ( Connection con = testConnect()){
-                    textArea = new TextArea();
+                    //textArea = new TextArea();
                     form = new EtudiantForm();
-                   // form.addListener(EtudiantForm.SaveEvent.class, this::saveEtudiant);
-                    //form.addListener(EtudiantForm.DeleteEvent.class, this::deleteContact);
+                   //form.addListener(EtudiantForm.SaveEvent.class, this::saveClicked);
+                    //form.addListener(EtudiantForm.DeleteEvent.class, this::deleteEtudiant);
                     form.addListener(EtudiantForm.CloseEvent.class, e -> closeEditor());
                    /*for (Integer elem :bdd2.getAllIds(con)){
                         //this.textArea.setValue("coucou");
@@ -53,10 +69,19 @@ public class test extends VerticalLayout {
                 grid.addColumn(Etudiant::getPrenom).setHeader("Prénom");
                 grid.addColumn(Etudiant::getEmail).setHeader("Adresse email");
                 grid.addColumn(Etudiant::getMdp).setHeader("Mot de passe");
-
-                //List<Module> people = DataService.getPeople();
-                grid.setItems(ensureTestData(con));
+               
+                //List<> people = DataService.getPeople();
+                grid.setItems(Etudiant.getListeEtudiant());
                 grid.getColumns().forEach(col -> col.setAutoWidth(true));
+                //grid.addSelectionListener(event -> setEtudiant(grid.asSingleSelect().getValue()));
+                 //updateGrid();
+
+              // save.addClickListener(event -> saveClicked());
+               //create.addClickListener(event -> createClicked());
+
+                // getContent().add(grid, create, form);
+                //binder.bindInstanceFields(this);
+               // binder.setBean(null);
                 grid.asSingleSelect().addValueChangeListener(evt -> editEtudiant(evt.getValue()));
                 add(grid,content); 
                } catch (SQLException ex) {
@@ -70,6 +95,31 @@ public class test extends VerticalLayout {
         grid.setColumns("Nom", "Prénom", "email","mot de passe");;
   
     }*/
+    
+    
+    /*private void createClicked() {
+        grid.asSingleSelect().clear();
+        setEtudiant(new Etudiant());
+    }
+
+    private void setEtudiant(Etudiant etudiant) {
+        this.etudiant = etudiant;
+        form.setEnabled(etudiant!= null);
+        binder.setBean(etudiant);
+    }
+
+    private void saveClicked() {
+        binder.readBean(etudiant);
+
+            etudiantDonneesTest.update(etudiant);
+        
+        updateGrid();
+        Notification.show("Saved!");
+    }
+
+    private void updateGrid() {
+        grid.setItems(etudiantDonneesTest.findAll());
+    }*/
    private void editEtudiant(Etudiant etudiant){
         if (etudiant == null){
             closeEditor();
@@ -80,21 +130,24 @@ public class test extends VerticalLayout {
         }
     }
     
-    private void closeEditor(){
+   private void closeEditor(){
         form.setEtudiant(null);
         form.setVisible(false);
-        removeClassName("editor");
+        //removeClassName("editor");
     }
-       /* private void saveEtudiant(EtudiantForm.SaveEvent event) {
+    /*private void saveEtudiant(EtudiantForm.SaveEvent event) {
         saveEtudiant(event.getEtudiant());
         updateList();
         closeEditor();
-    }*/
+    }
 
-    /*private void deleteEtudiant(EtudiantForm.DeleteEvent event) {
-        service.deleteEtudiant(event.getEtudiant());
+    private void deleteEtudiant(EtudiantForm.DeleteEvent event) {
+        deleteEtudiant(event.getEtudiant());
         updateList();
         closeEditor();
+    }
+      private void updateList() {
+        grid.setItems(Etudiant.tousLesEtudiants(con)(filterText.getValue()));
     }*/
    /* EtudiantForm form;
     Grid<Etudiant> grid = new Grid <>(Etudiant.class);

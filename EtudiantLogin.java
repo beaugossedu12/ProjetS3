@@ -26,7 +26,7 @@ public class EtudiantLogin extends VerticalLayout {
     private VuePrincipale main;
     
     private PasswordField vmdp;
-    private EmailField vmail;
+    public EmailField vmail;
     private Button vbvalider;
     private String login;
     private LoginForm LoginForm;
@@ -63,7 +63,7 @@ public class EtudiantLogin extends VerticalLayout {
         String mail = this.vmail.getValue();
         String mdp = this.vmdp.getValue();
         try {
-            Connection con = this.main.getSessionInfo().getConBdD();
+            Connection con = this.main.getSessionInfo().getConBdDE();
             Optional<Etudiant> user = login(con, mail, mdp);
             if(user.isEmpty()) {
                 Notification.show("Utilisateur ou pass invalide");

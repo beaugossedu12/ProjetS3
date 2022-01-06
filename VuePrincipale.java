@@ -23,8 +23,20 @@ import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import static fr.insa.zins.classe.bdd2.testConnect;
+import fr.insa.zins.classe.Etudiant;
+import static fr.insa.zins.classe.EtudiantDonnees.ensureTestData;
+import fr.insa.zins.classe.GroupeModule;
+import fr.insa.zins.classe.Module;
+import fr.insa.zins.classe.ModuleDonnees;
+import static fr.insa.zins.classe.ModuleDonnees.ensureTestDataM;
+import static fr.insa.zins.classe.ModuleDonnees.ensureTestDataV;
+import fr.insa.zins.classe.Voeux;
+import fr.insa.zins.classe.bdd2;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  *
@@ -54,9 +66,19 @@ public class VuePrincipale extends VerticalLayout{
     private final ProgressBar barre;
     private Icon espace;
     
+    public List<Etudiant> EtudiantList;
+     public List<Module> ModuleList;
+     public List<GroupeModule> GroupeModuleList; 
+     public List<Voeux> VoeuxList; 
+     
+    private Connection conBdD;
+    public Connection getConBdD() {
+        return conBdD;
+    }
 
-
-
+    public void setConBdD(Connection conBdD) {
+        this.conBdD = conBdD;
+    }
   
 
     public final void changeContenu(Component c) {
@@ -85,7 +107,52 @@ public class VuePrincipale extends VerticalLayout{
         barre.setValue(value);
 
     }
+   public static Connection testConnect()  throws ClassNotFoundException, SQLException {
+        Connection con = null;
+       // try {
+            // teste la pr�sence du driver postgresql
+            Class.forName("org.postgresql.Driver");
+            con = DriverManager.getConnection(
+                    "jdbc:postgresql://localhost:5432/postgres", "postgres", "pass");
+            con.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+          /*  con.setAutoCommit(false);
+                        con.commit();
+        } catch (Exception ex) {
+            if (con != null) {
+                try {
+                    con.rollback();
+                } catch (SQLException ex1) {}
+            }
+            throw new Error(ex);
+        }*/
+        return con;
+
+    }
+   // private EtudiantDonneesTest etudiantDonneesTest;
     public VuePrincipale(){
+        boolean conOK= true;
+        try{
+            this.conBdD= testConnect();
+            //this.conBdD.setAutoCommit(false);
+        }catch(ClassNotFoundException|SQLException ex){
+            conOK=false;
+        }
+               try{
+       bdd2.recreeTout(this.conBdD);
+        }catch(SQLException ex){
+            throw new Error(ex);
+        }
+ 
+        try{
+
+              Etudiant.setListeEtudiant(ensureTestData(conBdD));
+             GroupeModule.setListeGroupeModule(ModuleDonnees.ensureTestDataGM(conBdD));
+           Module.setListeModule(ensureTestDataM(conBdD));
+           Voeux.setListeVoeux(ensureTestDataV(conBdD));
+          }catch(SQLException ex){
+                    
+          }
+        //this.etudiantDonneesTest= etudiantDonneesTest;
         this.sessionInfo = new SessionInfoEtudiant();
         this.sessionInfoA = new SessionInfoAdmin();
         // ENTETE
@@ -230,7 +297,7 @@ public class VuePrincipale extends VerticalLayout{
 
         this.changeContenu(new Accueil(this));
         try{
-            this.sessionInfo.setConBdD(testConnect());
+            this.sessionInfo.setConBdDE(testConnect());
             this.sessionInfoA.setConBdDA(testConnect());
         } catch (ClassNotFoundException | SQLException ex) {
             this.changeContenu(new BdDNonAccessible(this));
