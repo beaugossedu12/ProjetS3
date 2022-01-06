@@ -204,19 +204,25 @@ public class VuePrincipale extends VerticalLayout{
         this.electifs = new Accordion();
 
         FormLayout accountForm = new FormLayout();
-        accountForm.add(new Span("prap"));
-        accountForm.add(new Span("prap2"));
-        accountForm.add(new Span("prap3"));
-        accountForm.add(new Text("prap4"));
-        electifs.add("Groupe éléctifs 1", accountForm);
+        accountForm.add(new Span("Algèbre"));
+        accountForm.add(new Span("Analyse"));
+        accountForm.add(new Span("Physique"));
+        electifs.add("Science", accountForm);
 
-        FormLayout accountFor = new FormLayout();
-        accountFor.add(new Span("prap"));
-        accountFor.add(new Span("prap2"));
-        accountFor.add(new Span("prap3"));
-        accountFor.add(new Text("prap4"));
+        FormLayout accountForm2 = new FormLayout();
+        accountForm2.add(new Span("Musique"));
+        accountForm2.add(new Span("Danse"));
+        accountForm2.add(new Span("Théâtre"));
+        electifs.add("Art", accountForm2);
+        
+        FormLayout accountForm3 = new FormLayout();
+        accountForm3.add(new Span("Aviron"));
+        accountForm3.add(new Span("Kayak"));
+        accountForm3.add(new Span("Course à pied"));
 
-        electifs.add("Groupe éléctifs 2", accountFor);
+        electifs.add("Sport", accountForm3);
+        
+        
 
         this.menugauche.add(this.electifs);
 
