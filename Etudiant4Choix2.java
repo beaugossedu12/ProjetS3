@@ -60,17 +60,17 @@ public class Etudiant4Choix2  extends VerticalLayout {
             
         }
         
-        this.titre = new H3("GROUPE DE MODULES 2");
+        this.titre = new H3("ART");
         titre.setSizeFull();
         this.add(this.titre);
         
-        this.m1 = new IntegerField("Choix 1");
+        this.m1 = new IntegerField("Musique");
         this.m1.setMin(1);
         this.m1.setMax(3);
-        this.m2 = new IntegerField("Choix 2");
+        this.m2 = new IntegerField("Danse");
         this.m2.setMin(1);
         this.m2.setMax(3);        
-        this.m3= new IntegerField("Choix 3");
+        this.m3= new IntegerField("Théâtre");
         this.m3.setMin(1);
         this.m3.setMax(3);
         this.add(this.m1,this.m2,this.m3);
