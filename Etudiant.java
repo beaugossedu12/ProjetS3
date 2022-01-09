@@ -19,13 +19,21 @@ import java.util.Optional;
  * @author sabin
  */
 public class Etudiant {
-    private final int id;
+    private  int id;
     private String nom;
     private String prenom;
     private String email;
     private String mdp;
     private Etudiant etudiant;
     private static List<Etudiant> listeEtudiant = new ArrayList();
+
+    public static List<Etudiant> getListeEtudiant() {
+        return listeEtudiant;
+    }
+
+    public static void setListeEtudiant(List<Etudiant> listeEtudiant) {
+        Etudiant.listeEtudiant = listeEtudiant;
+    }
   
 
     public Etudiant(int id,String nom, String prenom, String email, String mdp) {
@@ -39,6 +47,9 @@ public class Etudiant {
         this.id=id;
         this.email = email;
         this.mdp = mdp;
+    }
+    public Etudiant(){
+        
     }
     public int getId() {
         return id;
@@ -125,7 +136,7 @@ public class Etudiant {
         }
     }*/
     
-    public static int trouveEtudiant(Connection con, String nom)throws SQLException
+    public static int trouveIdEtudiant(Connection con, String nom)throws SQLException
     {
         try ( PreparedStatement pst = con.prepareStatement(
                 "select id from Etudiant where nom = ?")) {
@@ -138,6 +149,56 @@ public class Etudiant {
         }
     }
     
+        public static String trouvePrenomEtudiant(Connection con, String nom)throws SQLException
+    {
+        try ( PreparedStatement pst = con.prepareStatement(
+                "select prenom from Etudiant where nom = ?")) {
+            pst.setString(1, nom);
+            ResultSet findP = pst.executeQuery();
+            if (!findP.next()) {
+                return null;
+            }
+            return findP.getString(1);
+        }
+    }
+    public static String trouveEmailEtudiant(Connection con, String nom)throws SQLException
+    {
+        try ( PreparedStatement pst = con.prepareStatement(
+                "select email from Etudiant where nom = ?")) {
+            pst.setString(1, nom);
+            ResultSet findP = pst.executeQuery();
+            if (!findP.next()) {
+                return null;
+            }
+            return findP.getString(1);
+        }
+    }
+    
+    public static String trouveMdpEtudiant(Connection con, String nom)throws SQLException
+    {
+        try ( PreparedStatement pst = con.prepareStatement(
+                "select mdp from Etudiant where nom = ?")) {
+            pst.setString(1, nom);
+            ResultSet findP = pst.executeQuery();
+            if (!findP.next()) {
+                return null;
+            }
+            return findP.getString(1);
+        }
+    }
+       public static Etudiant trouveEtudiantListe(Connection con, String nom)throws SQLException
+    {
+        try ( PreparedStatement pst = con.prepareStatement(
+                "select * from Etudiant where nom = ?")) {
+            pst.setString(1, nom);
+            ResultSet findP = pst.executeQuery();
+            if (!findP.next()) {
+                return null;
+            }
+            Etudiant etudiantTrouve= new Etudiant(findP.getInt(1),findP.getString(2),findP.getString(3),findP.getString(4),findP.getString(5));
+            return etudiantTrouve;
+        }
+    } 
     public static void deleteEtudiant(Connection con,String nom) throws SQLException
     {
         try ( PreparedStatement pst = con.prepareStatement( 
@@ -201,7 +262,19 @@ public class Etudiant {
             }
         }
     }
-        public void saveEtudiant(Connection con, Etudiant etudiant) {
+    
+      /*  public List<Etudiant> findAllEtudiants(Connection con,String stringFilter) {
+        try {
+        if (stringFilter == null || stringFilter.isEmpty()) {
+            return tousLesEtudiants(con).findAll();
+        } else {
+            return tousLesEtudiants(con).search(stringFilter);
+        }
+        }catch (SQLException ex){
+            
+        }
+    }*/
+        /*public void saveEtudiant(Connection con, Etudiant etudiant) {
         try{
             if (etudiant == null) {
                 System.err.println("Contact is null. Are you sure you have connected your form to the application?");
@@ -211,7 +284,7 @@ public class Etudiant {
             } catch (Exception ex) {
                 System.out.println(ex);
             }
-    }
+    }*/
             public static Optional<Etudiant> login(Connection con, String email, String pass) throws SQLException {
         try ( PreparedStatement pst = con.prepareStatement(
                 "select id from etudiant where email = ? and mdp = ?")) {

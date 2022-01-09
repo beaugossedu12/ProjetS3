@@ -11,17 +11,29 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author sabin
  */
 public class GroupeModule {
-    private int id;
+
+
+   private int id;
  
     private String nom;
     private String description;
+    private static List<GroupeModule> listeGroupeModule = new ArrayList();
 
+    public static List<GroupeModule> getListeGroupeModule() {
+        return listeGroupeModule;
+    }
+
+    public static void setListeGroupeModule(List<GroupeModule> listeGroupeModule) {
+        GroupeModule.listeGroupeModule = listeGroupeModule;
+    }
+    
     public int getId() {
         return id;
     }
@@ -45,38 +57,12 @@ public class GroupeModule {
     public void setDescription(String description) {
         this.description = description;
     }
-    
-        private static GroupeModule rsToGroupeModule(ResultSet rs) throws SQLException {
-        GroupeModule groupeModule = new GroupeModule();  // Creation d'un nouveau groupeModule
-        groupeModule.setId(rs.getInt("id")); // Remplissage des attributs
-        groupeModule.setNom(rs.getString("Nom"));
-        groupeModule.setDescription(rs.getString("Description"));
-
-        return groupeModule;
-      }  
-     public static ArrayList chargeGroupeModule (Connection con)throws SQLException {
-        ResultSet rs = null;
-        ArrayList liste = null;
-        GroupeModule groupeModule = null;
-        try ( Statement st = con.createStatement()) {
-        rs = st.executeQuery("select * from GroupeModule");
-        if (rs.next()) {  // S'il y a des donnees
-          liste = new ArrayList();  // On construit une liste (vide pour l'instant)
-          do {  // Et pour chaque ligne du resultSet
-            groupeModule = rsToGroupeModule(rs);  // Recupère l'employe à partir du resultSet
-            liste.add(groupeModule);  // Ajout de l'employé à la liste
-          }
-          while(rs.next());
-        }
-         //... (fermer le resultset, le statement, enfin faire propore quoi)
-         st.close();
-         rs.close();
-        }catch(Exception e) {
-            e.printStackTrace();
-        }
-        return liste;  // Retourne la liste des employés ou null s'il n'y en a aucun
-      }
-     
+        public GroupeModule(int id, String nom, String description) {
+        this.id = id;
+        this.nom = nom;
+        this.description = description;
+    }
+      
     public static void afficheTousGroupeModule(Connection con)throws SQLException
     {
         try ( Statement st = con.createStatement()) {
@@ -108,6 +94,32 @@ public class GroupeModule {
         }
     }
 
+    public static int CompteGroupeModule(Connection con)throws SQLException 
+    {
+        try ( PreparedStatement pst = con.prepareStatement(
+                "select count(*) from GroupeModule ")) {
+            
+            ResultSet findP = pst.executeQuery();
+            if (!findP.next()) {
+                return -1;
+            }
+            return findP.getInt(1);
+        }
+    }
+    
+    public static String trouveDescriptionGroupeModule(Connection con, String nom)throws SQLException 
+    {
+        try ( PreparedStatement pst = con.prepareStatement(
+                "select description from GroupeModule where nom = ?")) {
+            pst.setString(1, nom);
+            
+            ResultSet findP = pst.executeQuery();
+            if (!findP.next()) {
+                return null;
+            }
+            return findP.getString(1);
+        }
+    }
     public static void ModifNomGroupeModule (Connection con, String nom, String nomModifie) throws SQLException
     {
         try ( PreparedStatement pst = con.prepareStatement(
@@ -153,7 +165,7 @@ public class GroupeModule {
             System.out.println(ex);
         }
     }
-    public static class GroupeModuleNotFoundException extends Exception {
+    /*public static class GroupeModuleNotFoundException extends Exception {
 
         public GroupeModuleNotFoundException(String nom) {
             super("Le groupe de modules de nom \"" + nom + "\" n'existe pas");
@@ -165,5 +177,6 @@ public class GroupeModule {
         public GroupeModuleAlreadyExistsException(String nom) {
             super("Le groupe de modules de nom \"" + nom + "\" existe déjà");
         }
-    }
+    }*/
+    
 }

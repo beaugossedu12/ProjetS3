@@ -18,12 +18,36 @@ import java.util.List;
  * @author sabin
  */
 public class Module {
-    private static int id;
-    private static int idGM;
-    private static String nom;
-    private static String description;
+    private  int id;
+    private  int idGM;
+    private  String nom;
+    private String description;
+    private static List<Module> listeModule = new ArrayList();
 
-    public static int getId() {
+    public static List<Module> getListeModule() {
+        return listeModule;
+    }
+
+    public static void setListeModule(List<Module> listeModule) {
+        Module.listeModule = listeModule;
+    }
+    public Module(int id, int idGM, String nom, String description) {
+        this.id = id;
+        this.idGM = idGM;
+        this.nom = nom;
+        this.description = description;
+    }
+
+
+
+        public Module() {
+
+    }
+     public Module (String nom) {
+
+        this.nom=nom;
+            }
+    public int getId() {
         return id;
     }
 
@@ -31,7 +55,7 @@ public class Module {
         this.id = id;
     }
 
-    public static int getIdGM() {
+    public int getIdGM() {
         return idGM;
     }
 
@@ -39,7 +63,7 @@ public class Module {
         this.idGM = idGM;
     }
 
-    public static String getNom() {
+    public  String getNom() {
         return nom;
     }
 
@@ -47,7 +71,7 @@ public class Module {
         this.nom = nom;
     }
 
-    public static String getDescription() {
+    public String getDescription() {
         return description;
     }
 
@@ -55,37 +79,6 @@ public class Module {
         this.description = description;
     }
     
-    private static Module rsToModule(ResultSet rs) throws SQLException {
-        Module module = new Module();  // Creation d'un nouveau module
-        module.setId(rs.getInt("id")); // Remplissage des attributs
-        module.setNom(rs.getString("nom"));
-        module.setDescription(rs.getString("description"));
-        module.setIdGM(rs.getInt("idGM"));
-        return module;
-      }  
-     public static ArrayList chargeModule(Connection con)throws SQLException {
-        ResultSet rs = null;
-        ArrayList liste = null;
-        Module module = null;
-        try ( Statement st = con.createStatement()) {
-            rs = st.executeQuery("select * from Module");
-            if (rs.next()) {  // S'il y a des donnees
-              liste = new ArrayList();  // On construit une liste (vide pour l'instant)
-              do {  // Et pour chaque ligne du resultSet
-                module = rsToModule(rs);  // Recupère l'employe à partir du resultSet
-                liste.add(module);  // Ajout de l'employé à la liste
-              }
-              while(rs.next());
-        }
-         //... (fermer le resultset, le statement, enfin faire propore quoi)
-         st.close();
-         rs.close();
-        }catch(Exception e) {
-            e.printStackTrace();
-        }
-        return liste;  // Retourne la liste des employés ou null s'il n'y en a aucun
-      }
-     
     public static void afficheTousModules(Connection con) throws SQLException
     {
         try ( Statement st = con.createStatement()) {
@@ -118,6 +111,47 @@ public class Module {
         }
     }
     
+    public static int trouveModule2(Connection con, String nom, int idGM)throws SQLException 
+    {
+        try ( PreparedStatement pst = con.prepareStatement(
+                "select id from Module where nom = ? and idGM=?")) {
+            pst.setString(1, nom);
+            pst.setInt(2, idGM);
+            ResultSet findP = pst.executeQuery();
+            if (!findP.next()) {
+                return -1;
+            }
+            return findP.getInt(1);
+        }
+    }
+    
+    public static String trouveDescriptionModule(Connection con, String nom)throws SQLException 
+    {
+        try ( PreparedStatement pst = con.prepareStatement(
+                "select description from Module where nom = ?")) {
+            pst.setString(1, nom);
+            
+            ResultSet findP = pst.executeQuery();
+            if (!findP.next()) {
+                return null;
+            }
+            return findP.getString(1);
+        }
+    }
+    
+    public static int trouveIdGMModule(Connection con, String nom)throws SQLException 
+    {
+        try ( PreparedStatement pst = con.prepareStatement(
+                "select idGM from Module where nom = ?")) {
+            pst.setString(1, nom);
+            ResultSet findP = pst.executeQuery();
+            if (!findP.next()) {
+                return -1;
+            }
+            return findP.getInt(1);
+        }
+    }
+
     public static void ModifNomModule (Connection con, String nom1, String nomModifier) throws SQLException
     {
         try ( PreparedStatement pst = con.prepareStatement(
@@ -164,7 +198,7 @@ public class Module {
        
         
     }
-    public static class ModuleAlreadyExistsException extends Exception {
+   /* public static class ModuleAlreadyExistsException extends Exception {
 
         public ModuleAlreadyExistsException(String nom) {
             super("Le module de nom \"" + nom + "\" existe déjà");
@@ -176,7 +210,7 @@ public class Module {
         public ModuleNotFoundException(String nom) {
             super("Le module de nom \"" + nom + "\" n'existe pas");
         }
-    }
+    }*/
 
     public static int moduletrouveGroupeModule(Connection con, String nom)throws SQLException 
     {

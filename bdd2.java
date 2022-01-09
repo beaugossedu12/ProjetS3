@@ -11,14 +11,13 @@ import static fr.insa.zins.classe.Administrateur.trouveAdministrateur;
 
 import static fr.insa.zins.classe.Etudiant.afficheTousEtudiants;
 import static fr.insa.zins.classe.Etudiant.deleteEtudiant;
-import static fr.insa.zins.classe.Etudiant.trouveEtudiant;
-import fr.insa.zins.classe.GroupeModule.GroupeModuleAlreadyExistsException;
+
 import static fr.insa.zins.classe.GroupeModule.afficheTousGroupeModule;
 import static fr.insa.zins.classe.GroupeModule.deleteGroupeModule;
 import static fr.insa.zins.classe.GroupeModule.trouveGroupeModule;
 import static fr.insa.zins.classe.Module.ModifDescriptionModule;
 import static fr.insa.zins.classe.Module.ModifNomModule;
-import fr.insa.zins.classe.Module.ModuleAlreadyExistsException;
+
 import static fr.insa.zins.classe.Module.afficheTousModules;
 import static fr.insa.zins.classe.Module.deleteModule;
 import static fr.insa.zins.classe.Module.trouveModule;
@@ -302,8 +301,8 @@ public static Connection connectPostgresql(String host, int port,
                """);
 
            st.executeUpdate("drop table Module");
-           st.executeUpdate("drop table GroupeModule");
            st.executeUpdate("drop table Voeux");
+           st.executeUpdate("drop table GroupeModule");
            st.executeUpdate("drop table Etudiant");
            st.executeUpdate("drop table Administrateur");
            
@@ -369,10 +368,10 @@ public static Connection connectPostgresql(String host, int port,
     }
     
     public static int createModule(Connection con, String nom, String description, int idGM) //idGM doit correspondre a un groupeModule existant, cmt?
-            throws SQLException, ModuleAlreadyExistsException {
-        if (trouveModule(con, nom) != -1) {
+            throws SQLException{
+       /* if (trouveModule(con, nom) != -1) {
             throw new ModuleAlreadyExistsException(nom);
-        }
+        }*/
 
         try ( PreparedStatement pst = con.prepareStatement( 
                 """
@@ -395,10 +394,10 @@ public static Connection connectPostgresql(String host, int port,
     }
     //pas demandé
         public static int createGroupeModule(Connection con, String nom, String description) 
-            throws SQLException, GroupeModuleAlreadyExistsException {
-        if (trouveGroupeModule(con, nom) != -1) {
+            throws SQLException{
+        /*if (trouveGroupeModule(con, nom) != -1) {
             throw new GroupeModuleAlreadyExistsException(nom);
-        }
+        }*/
 
         try ( PreparedStatement pst = con.prepareStatement( 
                 """
@@ -450,6 +449,8 @@ public static Connection connectPostgresql(String host, int port,
         String[][] donnees = new String[][]{
             // forme : {nom,prenom, email,mdp}
             {"toto", "titi","email1","mdp1"},
+            {"Zins","Sabine","sabine.zins@insa-strasbourg.fr","pass"},
+            {"Quarteroni","Arthur","arthur.quarteroni@insa-strasbourg.fr","pass"},
             {"Marley", "bob", "email2","mdp2"},
             {"SansSurnom", "bob", "email3","mdp3"}};
         for (String[] p : donnees) {
@@ -463,7 +464,7 @@ public static Connection connectPostgresql(String host, int port,
         }
         String[][] donneesAdmin = new String[][]{
             // forme : {nom,prenom, email,mdp}
-            {" admin1", "titi","email1","mdp1"}};
+            {" admin1", "admin","email1","mdp1"}};
  
         for (String[] p : donneesAdmin) {
            
@@ -476,43 +477,47 @@ public static Connection connectPostgresql(String host, int port,
         }
         String [][] donneesGroupeModule = new String[][]{
             //forme :{nom,description
-            {"groupemodule1","description gmodule1"},
-            {"groupemodule2","description gmodule2"},
-            {"groupemodule3","description gmodule3"} };
+            {"Science","description gmodule1"},
+            {"Art","description gmodule2"},
+            {"Sport","description gmodule3"} };
         
         for (String[] p : donneesGroupeModule) {
             try {
                 createGroupeModule(con, p[0],p[1]);
 
-            } catch (GroupeModuleAlreadyExistsException ex) {
+            } catch (Exception ex) {
                 throw new Error(ex);
             }
         }
-        String [][] donneesModule = new String[][]{
+         String [][] donneesModule = new String[][]{
             //forme :{nom,description, idgm
-            {"module1","description module1","1"},
-            {"module2","description module2","1"},
-            {"module3","description module3","2"}, 
-            {"module4",null,"2"},
-            {"module5","description module5","1"},
-            {"module6","description module6","2"}};
-            
+            {"Algèbre","description module1","1"},
+            {"Analyse","description module2","1"},
+            {"Physique","description module3","1"},
+            {"Musique","description module4","2"}, 
+            {"Danse",null,"2"},
+            {"Théâtre",null,"2"},
+            {"Kayak","description module7","3"},
+            {"Aviron","description module8","3"},
+            {"Course à pied","description module9","3"}};
         
         for (String[] p : donneesModule) {
             
             try {
                 createModule(con, p[0],p[1],Integer.parseInt(p[2]));
 
-            } catch (ModuleAlreadyExistsException ex) {
+            } catch (Exception ex) {
                 throw new Error(ex);
             }
         }
         String [][] donneesVoeux = new String[][]{
             //forme :{idEtudiant,idGM, choix1,choix2,choix3
-            {"1","1","1","2","5"},
-            {"1","2","4","3","6"},
-            {"2","1","2","1","5"}, 
-            {"2","2","3","4","6"}};
+            {"1","1","1","2","3"},
+            {"1","2","4","5","6"},
+            {"1","3","7","8","9"},
+            {"2","1","2","1","3"}, 
+            {"2","2","5","4","6"},
+            {"2","2","7","9","8"}};
         
         for (String[] p : donneesVoeux) {
        
@@ -530,7 +535,14 @@ public static Connection connectPostgresql(String host, int port,
             System.out.println("Schema non supprimé : première création ?");
         }
         createSchema(con);
-        creeDonneesTest(con);
+        //creeDonneesTest(con);
+        EtudiantDonnees.ensureTestData(con);
+         ModuleDonnees.ensureTestDataA(con);
+        ModuleDonnees.ensureTestDataGM(con);
+        ModuleDonnees.ensureTestDataM(con);
+        ModuleDonnees.ensureTestDataV(con);
+   
+                
     }
 
     public static List<Integer> getAllIds() throws SQLException, ClassNotFoundException {
@@ -590,7 +602,7 @@ public static Connection connectPostgresql(String host, int port,
                 int idGM= Console.entreeInt("idGM : ");
                 try {
                     createModule(con, nom, description,idGM);
-                } catch (ModuleAlreadyExistsException ex) {
+                } catch (Exception ex) {
                     System.out.println("Impossible : le module existe déjà");
                 }
                 
@@ -599,7 +611,7 @@ public static Connection connectPostgresql(String host, int port,
                 String description = Console.entreeString("description : ");
                 try {
                     createGroupeModule(con, nom, description);
-                } catch (GroupeModuleAlreadyExistsException ex) {
+                } catch (Exception ex) {
                     System.out.println("Impossible : le groupe de module existe déjà");
                 }
             } else if (rep == 5) {
@@ -642,7 +654,114 @@ public static Connection connectPostgresql(String host, int port,
             }
         }
     }
+    public static void fichierTexte(Connection con){
+        try {
+         JFileChooser filechoose = new JFileChooser();
+        // Créer un JFileChooser
+        
+        filechoose.setCurrentDirectory(new File(".")); // Le répertoire
+        //source du JFileChooser est le répertoire d'où est lancé
+        //notre programme
+        String approve = new String("ENREGISTRER");
+        // Le bouton pour valider l'enregistrement portera la
+        //mention ENREGSITRER
+        int resultatEnregistrer = filechoose.showDialog(filechoose, approve); // Pour afficher le JFileChooser...
+        if (resultatEnregistrer ==JFileChooser.APPROVE_OPTION) // Si l'utilisateur clique
+        //sur le bouton ENREGSITRER
+        { String monFichier= new String(filechoose.getSelectedFile().toString());
+        // Récupérer le nom du fichier qu'il a spécifié
+            if(monFichier.endsWith(".txt")|| monFichier.endsWith(".TXT")) {;}
+        // Si ce nom de fichier finit par .txt ou .TXT, ne rien faire et passer à
+        //a suite
+            //else{(monFichier = monFichier+ ".txt");}
+        // Sinon renommer le fichier pour qu'il porte l'extension .txt
+            { 
 
+                try{
+
+                    //FileWriter lu=new FileWriter(monFichier);
+                    BufferedWriter fichier1=new BufferedWriter(new FileWriter(monFichier, true));//new FileWriter("treillis.txt", true));
+                    //fichier1.write(creationFichier()); 
+                    try ( Statement st = con.createStatement()) {
+                        String sql = "select * from GroupeModule";
+  
+    
+                        try(PreparedStatement pstmt = con.prepareStatement(sql,ResultSet.TYPE_SCROLL_INSENSITIVE,
+                            ResultSet.CONCUR_READ_ONLY);){
+                          ResultSet rs = pstmt.executeQuery();
+                            rs.last();
+                            fichier1.write(rs.getRow());
+                            fichier1.newLine();
+                           }
+                        String sql2 = "select * from Module where idGM = '1'";
+                         try(PreparedStatement pstmt = con.prepareStatement(sql2,ResultSet.TYPE_SCROLL_INSENSITIVE,
+                            ResultSet.CONCUR_READ_ONLY);){
+                               ResultSet rs = pstmt.executeQuery();
+
+                              rs.last();
+                              fichier1.write(rs.getRow()); 
+                              fichier1.newLine();
+                         }
+                        fichier1.write("MODULES");
+                        fichier1.newLine();
+                        ResultSet res3 = st.executeQuery("select * from Module");
+                        while (res3.next()) {
+                            int id = res3.getInt("id");
+                            int idGM = res3.getInt("idGM");
+
+                            fichier1.write(id + ";" + idGM);
+                            fichier1.newLine();
+                        }
+                        fichier1.write("FINMODULES");
+                        fichier1.newLine();
+                        fichier1.write("CHOIX");
+                        fichier1.newLine();
+
+                        /*ResultSet res4 = st.executeQuery(
+                                """
+                                select Etudiant.id, choix1,choix2, choix3 from Etudiant 
+                                join Voeux on Etudiant.id=Voeux.idEtudiant 
+                                """);*/
+                        ResultSet res4 = st.executeQuery("select * from Voeux");
+                       
+                        while (res4.next()){ 
+                            int id = res4.getInt("idEtudiant");
+                            fichier1.write(id+";");
+                             // on peut accéder à une colonne par son nom
+
+                            int choix1=res4.getInt("choix1");
+                            int choix2=res4.getInt("choix2");
+                            int choix3=res4.getInt("choix3");
+                            fichier1.write(choix1+","+choix2+","+choix3);
+                            res4.next();
+                            int choix21=res4.getInt("choix1");
+                            int choix22=res4.getInt("choix2");
+                            int choix23=res4.getInt("choix3");
+                            fichier1.write(";" + choix21+","+choix22+","+choix23);
+                             res4.next();
+                            int choix31=res4.getInt("choix1");
+                            int choix32=res4.getInt("choix2");
+                            int choix33=res4.getInt("choix3");
+                            fichier1.write(";" + choix31+","+choix32+","+choix33);
+                            
+                            fichier1.newLine(); 
+                        }
+                    }
+                    fichier1.write("FINCHOIX");
+                    fichier1.newLine();
+                    fichier1.write("COUTS");
+                    fichier1.newLine();
+                    fichier1.write("FINCOUTS");
+                    fichier1.close();
+                }catch(Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        } catch (Exception ex) {
+            throw new Error("Probleme SQL : " + ex.getMessage(), ex);
+       }
+    }
    public static void test(String[] args) {
        try ( Connection con = testConnect()) {
          JFileChooser filechoose = new JFileChooser();
@@ -679,7 +798,7 @@ public static Connection connectPostgresql(String host, int port,
                             ResultSet.CONCUR_READ_ONLY);){
                           ResultSet rs = pstmt.executeQuery();
                             rs.last();
-                            fichier1.write("Nombre de groupe de module:"+rs.getRow());
+                            fichier1.write(rs.getRow());
                             fichier1.newLine();
                            }
                         String sql2 = "select * from Module where idGM = '1'";
@@ -688,7 +807,7 @@ public static Connection connectPostgresql(String host, int port,
                                ResultSet rs = pstmt.executeQuery();
 
                               rs.last();
-                              fichier1.write("Nombre de choix pour chaque groupe de module:"+rs.getRow()); 
+                              fichier1.write(rs.getRow()); 
                               fichier1.newLine();
                          }
                         fichier1.write("MODULES");
@@ -727,7 +846,11 @@ public static Connection connectPostgresql(String host, int port,
                             int choix22=res4.getInt("choix2");
                             int choix23=res4.getInt("choix3");
                             fichier1.write(";" + choix21+","+choix22+","+choix23);
-                           
+                             res4.next();
+                            int choix31=res4.getInt("choix1");
+                            int choix32=res4.getInt("choix2");
+                            int choix33=res4.getInt("choix3");
+                            fichier1.write(";" + choix31+","+choix32+","+choix33);
                             
                             fichier1.newLine(); 
                         }

@@ -41,18 +41,19 @@ public class EtudiantDonnees {//extends Grid<Etudiant>{
 				c.setNom(split[1]);
 				c.setEmail(split[0].toLowerCase() + "." + split[1].toLowerCase() + "@insa-strasbourg.fr");
 				c.setMdp("pass");
-                                Etudiant c1 = new Etudiant(id,c.getNom(),c.getPrenom(),c.getEmail(),c.getMdp());
-                            try {
-                                createEtudiant(con, split[1],split[0],split[0].toLowerCase() + "." + split[1].toLowerCase() + "@insa-strasbourg.fr","pass");
-                                //createEtudiant(con, c1.getNom(),c1.getPrenom(),c1.getEmail(),c1.getMdp());
                                 
-                             } catch (SQLException ex) {
+                            try {
+                                int id1 =createEtudiant(con, split[1],split[0],split[0].toLowerCase() + "." + split[1].toLowerCase() + "@insa-strasbourg.fr","pass");
+                                //createEtudiant(con, c1.getNom(),c1.getPrenom(),c1.getEmail(),c1.getMdp());
+                                Etudiant c1 = new Etudiant(id1,c.getNom(),c.getPrenom(),c.getEmail(),c.getMdp());
+                              EtudiantList.add(c1);
+                            } catch (SQLException ex) {
                                  throw new Error(ex);
                              }
                // int daysOld = 0 - r.nextInt(365 * 15 + 365 * 60);
                 //c.setBirthDate(LocalDate.now().plusDays(daysOld));
 				//save(c);*
-                                EtudiantList.add(c1);
+                               
                                 
 			}
                         return EtudiantList;
@@ -73,6 +74,6 @@ public class EtudiantDonnees {//extends Grid<Etudiant>{
                 }
             }
          }
-		
-	}
+    
+}
 
