@@ -5,8 +5,9 @@
  */
 package fr.insa.zins.testvaadin;
 
+import fr.insa.zins.testvaadin.Etudiant.SessionInfoEtudiant;
+import fr.insa.zins.testvaadin.Admin.SessionInfoAdmin;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -28,10 +29,12 @@ import static fr.insa.zins.classe.EtudiantDonnees.ensureTestData;
 import fr.insa.zins.classe.GroupeModule;
 import fr.insa.zins.classe.Module;
 import fr.insa.zins.classe.ModuleDonnees;
+import static fr.insa.zins.classe.ModuleDonnees.ensureTestDataGM;
 import static fr.insa.zins.classe.ModuleDonnees.ensureTestDataM;
 import static fr.insa.zins.classe.ModuleDonnees.ensureTestDataV;
 import fr.insa.zins.classe.Voeux;
-import fr.insa.zins.classe.bdd2;
+import static fr.insa.zins.classe.bdd2.createSchema;
+import static fr.insa.zins.classe.bdd2.deleteSchema;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -133,26 +136,26 @@ public class VuePrincipale extends VerticalLayout{
         boolean conOK= true;
         try{
             this.conBdD= testConnect();
-            //this.conBdD.setAutoCommit(false);
+        
         }catch(ClassNotFoundException|SQLException ex){
             conOK=false;
         }
-               try{
-       bdd2.recreeTout(this.conBdD);
-        }catch(SQLException ex){
-            throw new Error(ex);
-        }
- 
-        try{
 
-              Etudiant.setListeEtudiant(ensureTestData(conBdD));
-             GroupeModule.setListeGroupeModule(ModuleDonnees.ensureTestDataGM(conBdD));
+        try{
+            deleteSchema(conBdD);
+        } catch (SQLException ex) {
+            System.out.println("Schema non supprimé : première création ?");
+        }try{
+        createSchema(conBdD);
+           Etudiant.setListeEtudiant(ensureTestData(conBdD));
+           GroupeModule.setListeGroupeModule(ensureTestDataGM(conBdD));
            Module.setListeModule(ensureTestDataM(conBdD));
            Voeux.setListeVoeux(ensureTestDataV(conBdD));
+           ModuleDonnees.ensureTestDataA(conBdD);
           }catch(SQLException ex){
                     
           }
-        //this.etudiantDonneesTest= etudiantDonneesTest;
+       
         this.sessionInfo = new SessionInfoEtudiant();
         this.sessionInfoA = new SessionInfoAdmin();
         // ENTETE
@@ -221,8 +224,6 @@ public class VuePrincipale extends VerticalLayout{
         accountForm3.add(new Span("Course à pied"));
 
         electifs.add("Sport", accountForm3);
-        
-        
 
         this.menugauche.add(this.electifs);
 

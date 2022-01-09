@@ -5,6 +5,8 @@
  */
 package fr.insa.zins.testvaadin;
 
+import fr.insa.zins.testvaadin.Etudiant.EtudiantLogin;
+import fr.insa.zins.testvaadin.Admin.AdministrateurLogin;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.charts.model.Label;
 import com.vaadin.flow.component.icon.Icon;
